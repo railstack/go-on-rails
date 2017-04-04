@@ -1,0 +1,26 @@
+package model
+
+import (
+	"log"
+
+	<%= @db_config[:driver_package] %>
+	"github.com/jmoiron/sqlx"
+)
+
+var db *sqlx.DB
+
+func init() {
+	var err error
+	driver_name := "<%= @db_config[:driver_name] %>"
+	if driver_name == "" {
+		log.Fatal("Invalid driver name")
+	}
+	dsn := "<%= @db_config[:dsn] %>"
+	if dsn == "" {
+		log.Fatal("Invalid DSN")
+	}
+	db, err = sqlx.Connect(driver_name, dsn)
+	if err != nil {
+		log.Fatal(err)
+	}
+}

@@ -1,0 +1,30 @@
+Description:
+    generate Golang app by Rails models: use Rails as a model and migration tool to build a Golang app, or migrate some of existed Rails APIs to Golang to decouple and high-perform your services.
+
+    read more: https://github.com/gingerhot/goonrails
+
+
+Example:
+    rails generate gor development -m user post
+
+    Here are valid ENV_NAME arguments: [dev, development, pro, production, test], the default ENV_NAME is "development" if you omit it.
+
+    So you can also run:
+
+    rails g gor dev -m user post
+
+    This will mainly create:
+        go_app/main.go
+        go_app/db/conn.go
+        go_app/models/user/gor_user.go
+        go_app/models/user/gor_post.go
+
+    Notice: If you omit the -m option, all the models of the Rails app will be generated.
+
+    So if you omit all the options, just run:
+
+    rails g gor
+
+    This will generate all the models and database connection with Rails development env params.
+
+
