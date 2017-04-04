@@ -27,15 +27,26 @@ So you must have a Rails app or to create one before you can use go-on-rails gen
 
 You can basically run the command to convert the application:
 
-```ruby
+```bash
 rails g gor [dev(elopment) | pro(duction) | test]
 ```
 
-About more command details, you can run:
+Then a directory named "go_app" with Golang codes will be generated under your Rails app root path.
 
-```ruby
+Change to the "go_app" directory, and run:
+
+```bash
+go run main.go
+```
+
+You can visit the page in http://localhost:3000 by default.
+
+More command details about go-on-rails generator:
+
+```bash
 rails g gor --help
 ```
+
 
 And the gem is still under development, so there're a lot of known issues.
 
