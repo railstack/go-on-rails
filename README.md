@@ -5,19 +5,19 @@ go-on-rails
 
 Add this line to your application's Gemfile:
 
-``ruby
+```ruby
 gem 'go-on-rails'
-``
+```
 
 And then execute:
-``bash
+```bash
 $ bundle
-``
+```
 
 Or install it yourself as:
-``bash
+```bash
 $ gem install go-on-rails
-``
+```
 
 ## Usage
 
@@ -27,15 +27,15 @@ So you must have a Rails app or to create one before you can use go-on-rails gen
 
 You can basically run the command to convert the application:
 
-``ruby
+```ruby
 rails g gor [dev(elopment) | pro(duction) | test]
-``
+```
 
 About more command details, you can run:
 
-``ruby
+```ruby
 rails g gor --help
-``
+```
 
 And the gem is still under development, so there're a lot of known issues.
 
