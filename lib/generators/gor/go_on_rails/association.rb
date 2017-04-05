@@ -11,7 +11,7 @@ module GoOnRails
         def get_schema_info
             info = {struct_body: "", assoc_info: {has_many: {}, has_one: {}, belongs_to: {}}}
             self.klass.reflect_on_all_associations.each do |assoc|
-                tags = ["json:\"#{assoc.name.to_s}\" db:\"#{assoc.name.to_s}\""]
+                tags = ["json:\"#{assoc.name.to_s},omitempty\" db:\"#{assoc.name.to_s}\""]
                 case assoc.macro
                 when :has_many
                     col_name = assoc.name.to_s.camelize

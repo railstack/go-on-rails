@@ -374,7 +374,8 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) Save() error {
 	var_<%= model_name_underscore %>.UpdatedAt = time.Now()
 <%- end -%>
 	sqlFmt := `UPDATE <%= table_name %> SET %s WHERE id = %v`
-	sqlStr := fmt.Sprintf(sqlFmt, "<%= col_names.zip(col_names).map{|c| c.join(" = :")}.join(", ") %>", var_<%= model_name_underscore %>.Id)
+	<%- save_col_names = col_names - ["created_at"] -%>
+	sqlStr := fmt.Sprintf(sqlFmt, "<%= save_col_names.zip(save_col_names).map{|c| c.join(" = :")}.join(", ") %>", var_<%= model_name_underscore %>.Id)
     _, err := db.NamedExec(sqlStr, var_<%= model_name_underscore %>)
     return err
 }

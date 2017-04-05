@@ -88,7 +88,7 @@ module GoOnRails
         end
 
         def struct_tag(col)
-            "json:\"#{col.name}\" db:\"#{col.name}\""
+            "json:\"#{col.name},omitempty\" db:\"#{col.name}\""
         end
 
     end
