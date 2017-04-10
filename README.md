@@ -66,7 +66,8 @@ And the gem is still under development, so there're a lot of known issues.
 * and the :dependent action is triggered when destroying some related model
 * but the :through keyword not supported yet
 * databases specific functions between mysql, postgres are not covered yet
-* model callbacks in not available
+* model callbacks is not available
+* not support STI
 
 Really a lot...
 
