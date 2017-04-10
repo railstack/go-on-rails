@@ -1,6 +1,11 @@
 go-on-rails
 ====
 
+## Prerequisite
+
+* Rails development environment
+* Golang development environment
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -18,11 +23,6 @@ Or install it yourself as:
 ```bash
 $ gem install go-on-rails
 ```
-## Prerequisite
-
-* Rails development environment
-* Golang development environment
-
 ## Usage
 
 go-on-rails is a Rails generator used to generate Golang codes from your ever running Rails app or an application that you would create with familiar Rails command tools. One or more examples will be given later on.
