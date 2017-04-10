@@ -18,7 +18,7 @@ Or install it yourself as:
 ```bash
 $ gem install go-on-rails
 ```
-## Prerequisite:
+## Prerequisite
 
 * Rails development environment
 * Golang development environment
