@@ -56,6 +56,9 @@ class GorGenerator < Rails::Generators::Base
           copy_file "index.tmpl", "go_app/views/index.tmpl"
           copy_file "favicon.ico", "go_app/public/favicon.ico"
       end
+
+      # use gofmt to prettify the generated Golang files
+      gofmt_go_files
   end
 
   private
@@ -88,6 +91,10 @@ class GorGenerator < Rails::Generators::Base
       end
   end
 
+  def gofmt_go_files
+    go_files = Rails.root.join('go_app', 'models/*.go').to_s
+    system "gofmt -w #{go_files} > /dev/null 2>&1"
+  end
 end
 
 require_relative 'go_on_rails/converter'

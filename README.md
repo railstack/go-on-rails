@@ -32,7 +32,7 @@ So you must have a Rails app or to create one before you can use go-on-rails gen
 You can basically run the command to convert the application:
 
 ```bash
-rails g gor [dev(elopment) | pro(duction) | test]
+rails g gor [dev(elopment) | pro(duction) | test] [-m model_a model_b model_c ...]
 ```
 
 Then a directory named "go_app" with Golang codes will be generated under your Rails app root path.
