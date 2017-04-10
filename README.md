@@ -18,6 +18,10 @@ Or install it yourself as:
 ```bash
 $ gem install go-on-rails
 ```
+## Prerequisite:
+
+* Rails development environment
+* Golang development environment
 
 ## Usage
 
@@ -33,7 +37,13 @@ rails g gor [dev(elopment) | pro(duction) | test]
 
 Then a directory named "go_app" with Golang codes will be generated under your Rails app root path.
 
-Change to the "go_app" directory, and run:
+Install the dependent Golang packages:
+
+```bash
+rails gor:deps
+```
+
+Then change to the "go_app" directory, and run:
 
 ```bash
 go run main.go
@@ -46,7 +56,6 @@ More command details about go-on-rails generator:
 ```bash
 rails g gor --help
 ```
-
 
 And the gem is still under development, so there're a lot of known issues.
 
