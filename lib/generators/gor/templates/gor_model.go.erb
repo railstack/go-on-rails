@@ -180,9 +180,9 @@ func Find<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (<%=
 	return <%= param_name_plural %>, nil
 }
 
-func Create<%= @model_name %>(am map[string]interface{}) error {
+func Create<%= @model_name %>(am map[string]interface{}) (int64, error) {
 	if len(am) == 0 {
-		return fmt.Errorf("Zero key in the attributes map!")
+		return 0, fmt.Errorf("Zero key in the attributes map!")
 	}
 <%- unless @struct_info[:timestamp_cols].empty? -%>
 	t := time.Now()
@@ -200,12 +200,17 @@ func Create<%= @model_name %>(am map[string]interface{}) error {
 	}
 	sqlFmt := `INSERT INTO <%= table_name %> (%s) VALUES (%s)`
 	sqlStr := fmt.Sprintf(sqlFmt, strings.Join(keys, ","), ":"+strings.Join(keys, ",:"))
-	_, err := db.NamedExec(sqlStr, am)
+	result, err := db.NamedExec(sqlStr, am)
 	if err != nil {
 		log.Print(err)
-		return err
+		return 0, err
 	}
-	return nil
+	lastId, err := result.LastInsertId()
+	if err != nil {
+		log.Print(err)
+		return 0, err
+	}
+	return lastId, nil
 }
 
 func (var_<%= model_name_underscore %> *<%= @model_name %>) Create() error {
