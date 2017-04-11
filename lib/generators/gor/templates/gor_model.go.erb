@@ -43,9 +43,13 @@ func Find<%= @model_name.pluralize %>(ids ...int64) ([]<%= @model_name %>, error
 		return nil, errors.New(msg)
 	}
 	var_<%= param_name_plural %> := []<%= @model_name %>{}
-	idsStr := strings.Trim(strings.Replace(fmt.Sprint(ids), " ", ",", -1), "[]")
-	sql := fmt.Sprintf(`SELECT * FROM <%= table_name %> WHERE id IN (%s)`, idsStr)
-	err := db.Select(&var_<%= param_name_plural %>, sql)
+	idsHolder := strings.Repeat(",?", len(ids)-1)
+	sql := fmt.Sprintf(`SELECT * FROM <%= table_name %> WHERE id IN (?%s)`, idsHolder)
+	idsT := []interface{}{}
+	for _,id := range ids {
+		idsT = append(idsT, interface{}(id))
+	}
+	err := db.Select(&var_<%= param_name_plural %>, sql, idsT...)
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -229,25 +233,43 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) Create() error {
 	<%- has_many = @struct_info[:assoc_info][:has_many] -%>
 	<%- has_many.each do |k, v| -%>
 func (var_<%= model_name_underscore %> *<%= @model_name %>) <%= v[:class_name].pluralize %>Create(am map[string]interface{}) error {
-	<%- if v[:foreign_key] -%>
-	am["<%= v[:foreign_key] %>"] = var_<%= model_name_underscore %>.Id
-    <%- else -%>
-	am["<%= model_name_underscore %>_id"] = var_<%= model_name_underscore %>.Id
+	<%- if v[:through] -%>
+		// FIXME: use transaction to create these associated objects
+		<%= v[:class_name].underscore %>_id, err := Create<%= v[:class_name] %>(am)
+		if err != nil {
+			return err
+		}
+		_, err = Create<%= v[:through].to_s.singularize.camelize %>(map[string]interface{}{"<%= model_name_underscore %>_id": var_<%= model_name_underscore %>.Id, "<%= v[:class_name].underscore %>_id": <%= v[:class_name].underscore %>_id})
+	<%- else -%>
+		<%- if v[:foreign_key] -%>
+			am["<%= v[:foreign_key] %>"] = var_<%= model_name_underscore %>.Id
+		<%- else -%>
+			am["<%= model_name_underscore %>_id"] = var_<%= model_name_underscore %>.Id
+		<%- end -%>
+		_, err := Create<%= v[:class_name] %>(am)
 	<%- end -%>
-	err := Create<%= v[:class_name] %>(am)
 	return err
 }
 
 func (var_<%= model_name_underscore %> *<%= @model_name %>) Get<%= v[:class_name].pluralize %>() error {
-	<%- if v[:foreign_key] -%>
-	var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>By("<%= v[:foreign_key] %>", var_<%= model_name_underscore %>.Id)
-    <%- else -%>
-	var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>By("<%= model_name_underscore %>_id", var_<%= model_name_underscore %>.Id)
+	<%- if v[:through] -%>
+		// FIXME: use transaction to create these associated objects
+		<%= v[:class_name].underscore %>_ids, err := <%= v[:through].to_s.singularize.camelize %>IntCol("<%= v[:class_name].underscore %>_id", "<%= model_name_underscore %>_id = ?", var_<%= model_name_underscore %>.Id)
+		if err != nil {
+			return err
+		}
+		var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>(<%= v[:class_name].underscore %>_ids...)
+	<%- else -%>
+		<%- if v[:foreign_key] -%>
+			var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>By("<%= v[:foreign_key] %>", var_<%= model_name_underscore %>.Id)
+		<%- else -%>
+			var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>By("<%= model_name_underscore %>_id", var_<%= model_name_underscore %>.Id)
+		<%- end -%>
 	<%- end -%>
 	if err == nil {
 		var_<%= model_name_underscore %>.<%= k %> = var_<%= v[:class_name].underscore.pluralize %>
-	}
-	return err
+    }
+    return err
 }
 	<%- end -%>
 <%- end -%>
@@ -261,7 +283,7 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) Create<%= v[:class_n
     <%- else -%>
 	am["<%= model_name_underscore %>_id"] = var_<%= model_name_underscore %>.Id
 	<%- end -%>
-	err := Create<%= v[:class_name] %>(am)
+	_, err := Create<%= v[:class_name] %>(am)
 	return err
 }
 	<%- end -%>
@@ -276,7 +298,7 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) Create<%= v[:class_n
     <%- else -%>
 	am["<%= model_name_underscore %>_id"] = var_<%= model_name_underscore %>.Id
 	<%- end -%>
-	err := Create<%= v[:class_name] %>(am)
+	_, err := Create<%= v[:class_name] %>(am)
 	return err
 }
 	<%- end -%>
@@ -301,10 +323,25 @@ func Destroy<%= @model_name %>(id int64) error {
 		<%- unless ass_cols.empty? -%>
 			<%- ass_cols.each_value do |opts| -%>
 				<%- if opts.key? :dependent -%>
-					<%- if opts.key? :foreign_key -%>
-    Destroy<%= opts[:class_name].pluralize %>Where("<%= opts[:foreign_key] %> = ?", id)
+					<%- if opts[:through] -%>
+						<%= opts[:class_name].underscore %>_ids, err := <%= opts[:through].to_s.singularize.camelize %>IntCol("<%= opts[:class_name].underscore %>_id", "<%= model_name_underscore %>_id = ?", var_<%= model_name_underscore %>.Id)
+						if err != nil {
+							return err
+						}
+						_, err = Destroy<%= opts[:class_name].pluralize %>(<%= opts[:class_name].underscore %>_ids...)
+						if err != nil {
+							return err
+						}
+						_, err = Destroy<%= opts[:through].to_s.pluralize.camelize %>Where("<%= model_name_underscore %>_id = ?", var_<%= model_name_underscore %>.Id)
+						if err != nil {
+							return err
+						}
 					<%- else -%>
-    Destroy<%= opts[:class_name].pluralize %>Where("<%= model_name_underscore %>_id = ?", id)
+						<%- if opts.key? :foreign_key -%>
+							Destroy<%= opts[:class_name].pluralize %>Where("<%= opts[:foreign_key] %> = ?", id)
+						<%- else -%>
+							Destroy<%= opts[:class_name].pluralize %>Where("<%= model_name_underscore %>_id = ?", id)
+						<%- end -%>
 					<%- end -%>
 				<%- end -%>
 			<%- end -%>
@@ -319,10 +356,14 @@ func Destroy<%= @model_name.pluralize %>(ids ...int64) (int64, error) {
 		log.Println(msg)
 		return 0, errors.New(msg)
 	}
-	idsStr := strings.Trim(strings.Replace(fmt.Sprint(ids), " ", ",", -1), "[]")
-	sql := fmt.Sprintf(`DELETE FROM <%= table_name %> WHERE id IN (%s)`, idsStr)
+	idsHolder := strings.Repeat(",?", len(ids)-1)
+	sql := fmt.Sprintf(`DELETE FROM <%= table_name %> WHERE id IN (?%s)`, idsHolder)
+	idsT := []interface{}{}
+	for _,id := range ids {
+		idsT = append(idsT, interface{}(id))
+	}
 	stmt, err := db.Preparex(sql)
-	result, err := stmt.Exec()
+	result, err := stmt.Exec(idsT...)
 	if err != nil {
 		return 0, err
 	}
@@ -336,11 +377,11 @@ func Destroy<%= @model_name.pluralize %>(ids ...int64) (int64, error) {
 			<%- ass_cols.each_value do |opts| -%>
 				<%- if opts.key? :dependent -%>
 					<%- if opts.key? :foreign_key -%>
-    where := fmt.Sprintf("<%= opts[:foreign_key] %> IN (%s)", idsStr)
-    Destroy<%= opts[:class_name].pluralize %>Where(where)
+    where := fmt.Sprintf("<%= opts[:foreign_key] %> IN (?%s)", idsHolder)
+    Destroy<%= opts[:class_name].pluralize %>Where(where, idsT)
 					<%- else -%>
-	where := fmt.Sprintf("<%= model_name_underscore %>_id IN (%s)", idsStr)
-    Destroy<%= opts[:class_name].pluralize %>Where(where)
+	where := fmt.Sprintf("<%= model_name_underscore %>_id IN (?%s)", idsHolder)
+    Destroy<%= opts[:class_name].pluralize %>Where(where, idsT)
 					<%- end -%>
 				<%- end -%>
 			<%- end -%>
