@@ -25,11 +25,17 @@ $ gem install go-on-rails
 ```
 ## Usage
 
-go-on-rails is a Rails generator used to generate Golang codes from your ever running Rails app or an application that you would create with familiar Rails command tools. One or more examples will be given later on.
+go-on-rails aims at three scenarios:
 
-So you must have a Rails app or to create one before you can use go-on-rails generator to convert a Rails app to Golang codes.
+1. Integrate Golang api to existed Rails app for high performance
+2. Use your farmiliar Rails tools to develope and manage a Golang app project
+3. Convert a *not very complicated* Rails app to Golang equivalent
 
-You can basically run the command to convert the application:
+One or more examples will be given later on.
+
+So you must have a Rails app or to create one before you can try go-on-rails generator to convert a Rails app to Golang codes.
+
+You can just run the command to convert the application:
 
 ```bash
 rails g gor [dev(elopment) | pro(duction) | test] [-m model_a model_b model_c ...]
@@ -43,7 +49,7 @@ Install the dependent Golang packages:
 rails gor:deps
 ```
 
-Then change to the "go_app" directory, and run:
+Then change to the "go_app" directory and run:
 
 ```bash
 go run main.go
@@ -64,9 +70,9 @@ And the gem is still under development, so there're a lot of known issues.
 * the generated Golang codes includes the association between models, basic relations like has_many, has_one, belongs_to have been supported
 * so some association functions is available
 * and the :dependent action is triggered when destroying some related model
-* but the :through keyword not supported yet
 * databases specific functions between mysql, postgres are not covered yet
 * model callbacks is not available
+* sql.NullType not supported yet
 
 Really a lot...
 
