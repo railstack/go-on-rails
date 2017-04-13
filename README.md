@@ -1,7 +1,7 @@
 go-on-rails
 ====
 
-## Prerequisite
+## Prerequisites
 
 * Rails development environment
 * Golang development environment
@@ -67,7 +67,6 @@ And the gem is still under development, so there're a lot of known issues.
 * but the :through keyword not supported yet
 * databases specific functions between mysql, postgres are not covered yet
 * model callbacks is not available
-* not support STI
 
 Really a lot...
 
