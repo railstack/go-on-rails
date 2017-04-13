@@ -72,7 +72,7 @@ And the gem is still under development, so there're a lot of known issues.
 * and the :dependent action is triggered when destroying some related model
 * databases specific functions between mysql, postgres are not covered yet
 * model callbacks is not available
-* sql.NullType not supported yet
+* sql.NullType not supported yet, so you'd better set all columns "not null" with a default value in the migration, such as "" default for string and text typed column, and 0 default for int, etc, that's consistent with Golang's zero value specification.
 
 Really a lot...
 
