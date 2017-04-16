@@ -88,3 +88,6 @@ When I had the idea to convert Rails app or build Golang app with Rails tools, I
 - Commit, do not mess with Rakefile or version (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
 - Send me a pull request. Bonus points for topic branches.
 
+## License
+
+See the [LICENSE](https://github.com/goonr/go-on-rails/blob/master/MIT-LICENSE) file.
