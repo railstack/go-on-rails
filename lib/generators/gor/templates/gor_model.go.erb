@@ -27,7 +27,7 @@ func Find<%= @model_name %>(id int64) (*<%= @model_name %>, error) {
 		return nil, errors.New("Invalid id: it can't be zero")
 	}
 	var_<%= model_name_underscore %> := <%= @model_name %>{}
-	err := db.Get(&var_<%= model_name_underscore %>, `SELECT * FROM <%= table_name %> WHERE id = ? LIMIT 1`, id)
+	err := db.Get(&var_<%= model_name_underscore %>, db.Rebind(`SELECT * FROM <%= table_name %> WHERE id = ? LIMIT 1`), id)
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -44,7 +44,7 @@ func Find<%= @model_name.pluralize %>(ids ...int64) ([]<%= @model_name %>, error
 	}
 	var_<%= param_name_plural %> := []<%= @model_name %>{}
 	idsHolder := strings.Repeat(",?", len(ids)-1)
-	sql := fmt.Sprintf(`SELECT * FROM <%= table_name %> WHERE id IN (?%s)`, idsHolder)
+	sql := db.Rebind(fmt.Sprintf(`SELECT * FROM <%= table_name %> WHERE id IN (?%s)`, idsHolder))
 	idsT := []interface{}{}
 	for _,id := range ids {
 		idsT = append(idsT, interface{}(id))
@@ -62,7 +62,7 @@ func Find<%= @model_name %>By(field string, val interface{}) (*<%= @model_name %
 	var_<%= model_name_underscore %> := <%= @model_name %>{}
 	sqlFmt := `SELECT * FROM <%= table_name %> WHERE %s = ? LIMIT 1`
 	sqlStr := fmt.Sprintf(sqlFmt, field)
-	err := db.Get(&var_<%= model_name_underscore %>, sqlStr, val)
+	err := db.Get(&var_<%= model_name_underscore %>, db.Rebind(sqlStr), val)
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -74,7 +74,7 @@ func Find<%= @model_name %>By(field string, val interface{}) (*<%= @model_name %
 func Find<%= @model_name.pluralize %>By(field string, val interface{}) (var_<%= param_name_plural %> []<%= @model_name %>, err error) {
 	sqlFmt := `SELECT * FROM <%= table_name %> WHERE %s = ?`
 	sqlStr := fmt.Sprintf(sqlFmt, field)
-	err = db.Select(&var_<%= param_name_plural %>, sqlStr, val)
+	err = db.Select(&var_<%= param_name_plural %>, db.Rebind(sqlStr), val)
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -196,7 +196,7 @@ func <%= @model_name %>IntCol(col, where string, args ...interface{}) (intColRec
 	if len(where) > 0 {
 		sql = sql + " WHERE " + where
 	}
-	stmt, err := db.Preparex(sql)
+	stmt, err := db.Preparex(db.Rebind(sql))
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -215,7 +215,7 @@ func <%= @model_name %>StrCol(col, where string, args ...interface{}) (strColRec
 	if len(where) > 0 {
 		sql = sql + " WHERE " + where
 	}
-	stmt, err := db.Preparex(sql)
+	stmt, err := db.Preparex(db.Rebind(sql))
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -236,7 +236,7 @@ func Find<%= @model_name.pluralize %>Where(where string, args ...interface{}) (<
 	if len(where) > 0 {
 		sql = sql + " WHERE " + where
 	}
-	stmt, err := db.Preparex(sql)
+	stmt, err := db.Preparex(db.Rebind(sql))
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -253,7 +253,7 @@ func Find<%= @model_name.pluralize %>Where(where string, args ...interface{}) (<
 // with placeholders, eg: FindUsersBySql("SELECT * FROM users WHERE first_name = ? AND age > ?", "John", 18)
 // will return those records in the table "users" whose first_name is "John" and age elder than 18
 func Find<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (<%= param_name_plural %> []<%= @model_name %>, err error) {
-	stmt, err := db.Preparex(sql)
+	stmt, err := db.Preparex(db.Rebind(sql))
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -395,7 +395,7 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) Destroy() error {
 }
 
 func Destroy<%= @model_name %>(id int64) error {
-	stmt, err := db.Preparex(`DELETE FROM <%= table_name %> WHERE id = ?`)
+	stmt, err := db.Preparex(db.Rebind(`DELETE FROM <%= table_name %> WHERE id = ?`))
 	_, err = stmt.Exec(id)
 	if err != nil {
 		return err
@@ -449,7 +449,7 @@ func Destroy<%= @model_name.pluralize %>(ids ...int64) (int64, error) {
 	for _,id := range ids {
 		idsT = append(idsT, interface{}(id))
 	}
-	stmt, err := db.Preparex(sql)
+	stmt, err := db.Preparex(db.Rebind(sql))
 	result, err := stmt.Exec(idsT...)
 	if err != nil {
 		return 0, err
@@ -487,7 +487,7 @@ func Destroy<%= @model_name.pluralize %>Where(where string, args ...interface{})
 	} else {
 		return 0, errors.New("No WHERE conditions provided")
 	}
-	stmt, err := db.Preparex(sql)
+	stmt, err := db.Preparex(db.Rebind(sql))
 	result, err := stmt.Exec(args...)
 	if err != nil {
 		return 0, err
@@ -573,7 +573,7 @@ func Update<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (i
 	sql = strings.Replace(strings.ToLower(sql), "set", "set updated_at = ?, ", 1)
 	args = append([]interface{}{time.Now()}, args...)
 <%- end -%>
-	stmt, err := db.Preparex(sql)
+	stmt, err := db.Preparex(db.Rebind(sql))
 	result, err := stmt.Exec(args...)
 	if err != nil {
 		return 0, err
