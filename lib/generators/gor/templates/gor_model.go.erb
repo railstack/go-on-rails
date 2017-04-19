@@ -125,7 +125,7 @@ func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interf
 						continue
 					}
 					for _, vv := range var_<%= v[:class_name].underscore.pluralize %> {
-						for _, vvv := range  var_<%= param_name_plural %> {
+						for i, vvv := range  var_<%= param_name_plural %> {
 							<%- if v[:foreign_key] -%>
 								if vv.<%= v[:foreign_key].camelize %> == vvv.Id {
 									vvv.<%= k %> = append(vvv.<%= k %>, vv)
@@ -135,6 +135,7 @@ func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interf
 									vvv.<%= k %> = append(vvv.<%= k %>, vv)
 								}
 							<%- end -%>
+							var_<%= param_name_plural %>[i].<%= k %> = vvv.<%= k %>
 						}
 					}
 				<%- end -%>
@@ -142,7 +143,7 @@ func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interf
 			<%- unless @struct_info[:assoc_info][:has_one].empty? -%>
 				<%- has_one = @struct_info[:assoc_info][:has_one] -%>
 				<%- has_one.each do |k, v| -%>
-				case "<%= k %>":
+				case "<%= k.underscore %>":
 					<%- if v[:foreign_key] -%>
 						where := fmt.Sprintf("<%= v[:foreign_key] %> IN (?%s)", idsHolder)
 					<%- else -%>
@@ -154,7 +155,7 @@ func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interf
 						continue
 					}
 					for _, vv := range var_<%= v[:class_name].underscore.pluralize %> {
-						for _, vvv := range  var_<%= param_name_plural %> {
+						for i, vvv := range  var_<%= param_name_plural %> {
 							<%- if v[:foreign_key] -%>
 								if vv.<%= v[:foreign_key].camelize %> == vvv.Id {
 									vvv.<%= k %> = vv
@@ -164,6 +165,7 @@ func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interf
 									vvv.<%= k %> = vv
 								}
 							<%- end -%>
+							var_<%= param_name_plural %>[i].<%= k %> = vvv.<%= k %>
 						}
 					}
 				<%- end -%>
