@@ -3,7 +3,7 @@ go-on-rails
 
 go-on-rails aims at three scenarios:
 
-1. Integrate some api written in Golang to existed Rails app for high performance
+1. Integrate some APIs written in Golang to existed Rails app for high performance
 2. Use your farmiliar Rails tools to develope and manage a Golang app project
 3. Convert a *not very complicated* Rails app to Golang equivalent
 
