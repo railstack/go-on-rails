@@ -1,6 +1,14 @@
 go-on-rails
 ====
 
+go-on-rails aims at three scenarios:
+
+1. Integrate some api written in Golang to existed Rails app for high performance
+2. Use your farmiliar Rails tools to develope and manage a Golang app project
+3. Convert a *not very complicated* Rails app to Golang equivalent
+
+One or more examples will be given later on.
+
 ## Prerequisites
 
 * Rails development environment
@@ -25,15 +33,7 @@ $ gem install go-on-rails
 ```
 ## Usage
 
-go-on-rails aims at three scenarios:
-
-1. Integrate some api written in Golang to existed Rails app for high performance
-2. Use your farmiliar Rails tools to develope and manage a Golang app project
-3. Convert a *not very complicated* Rails app to Golang equivalent
-
-One or more examples will be given later on.
-
-So you must have a Rails app or to create one before you can try go-on-rails generator to convert a Rails app to Golang codes.
+You must have a Rails app or to create one before you can try go-on-rails generator to convert a Rails app to Golang codes.
 
 You can just run the command to convert the application:
 
