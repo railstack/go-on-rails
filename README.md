@@ -1,3 +1,5 @@
+<img align="right" width="300" height="300" src="./go-on-rails.png">
+
 go-on-rails
 ====
 
