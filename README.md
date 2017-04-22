@@ -1,4 +1,4 @@
-<img align="right" width="250" height="250" src="./go-on-rails.png">
+<img align="right" width="255" height="255" src="./go-on-rails.png">
 
 go-on-rails
 ====
