@@ -406,7 +406,7 @@ func Destroy<%= @model_name %>(id int64) error {
 	if err != nil {
 		return err
 	}
-	<%- if has_assoc -%>
+	<%- if @struct_info[:has_assoc_dependent] -%>
 	// not care if exec properly temporarily
 	destroy<%= @model_name %>Associations(id)
     <%- end -%>
@@ -434,7 +434,7 @@ func Destroy<%= @model_name.pluralize %>(ids ...int64) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	<%- if has_assoc -%>
+	<%- if @struct_info[:has_assoc_dependent] -%>
 	// not care if exec properly temporarily
 	destroy<%= @model_name %>Associations(ids...)
 	<%- end -%>
@@ -451,7 +451,7 @@ func Destroy<%= @model_name.pluralize %>Where(where string, args ...interface{})
 	} else {
 		return 0, errors.New("No WHERE conditions provided")
 	}
-	<%- if has_assoc -%>
+	<%- if @struct_info[:has_assoc_dependent] -%>
 	ids, x_err := <%= @model_name %>IdsWhere(where, args...)
 	<%- end -%>
 	stmt, err := db.Preparex(db.Rebind(sql))
@@ -463,7 +463,7 @@ func Destroy<%= @model_name.pluralize %>Where(where string, args ...interface{})
 	if err != nil {
 		return 0, err
 	}
-	<%- if has_assoc -%>
+	<%- if @struct_info[:has_assoc_dependent] -%>
 	if x_err != nil {
 		log.Printf("Delete associated objects error: %v\n", err)
 	} else {
@@ -473,7 +473,7 @@ func Destroy<%= @model_name.pluralize %>Where(where string, args ...interface{})
 	return cnt, nil
 }
 
-<%- if has_assoc -%>
+<%- if @struct_info[:has_assoc_dependent] -%>
 // the func not return err temporarily
 func destroy<%= @model_name %>Associations(ids ...int64) {
 	idsHolder := ""

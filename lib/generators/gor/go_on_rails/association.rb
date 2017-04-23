@@ -9,7 +9,7 @@ module GoOnRails
     attr_reader :klass, :models, :max_col_size, :max_type_size
 
     def get_schema_info
-      info = {struct_body: "", assoc_info: {has_many: {}, has_one: {}, belongs_to: {}}}
+      info = {struct_body: "", has_assoc_dependent: false, assoc_info: {has_many: {}, has_one: {}, belongs_to: {}}}
       self.klass.reflect_on_all_associations.each do |assoc|
         tags = ["json:\"#{assoc.name.to_s},omitempty\" db:\"#{assoc.name.to_s}\""]
         case assoc.macro
@@ -30,6 +30,7 @@ module GoOnRails
           info[:assoc_info][assoc.macro][col_name] = {class_name: class_name}
           info[:assoc_info][assoc.macro][col_name].merge!(assoc.options) unless assoc.options.empty?
         end
+        info[:has_assoc_dependent] = true if assoc.options.key? :dependent
         if col_name && type_name && (self.models.include? class_name)
           format = "\t%-#{max_col_size}.#{max_col_size+2}s%-#{max_type_size}.#{max_type_size}s`%s`\n"
           info[:struct_body] << sprintf(format, col_name, type_name, tags.join(" "))

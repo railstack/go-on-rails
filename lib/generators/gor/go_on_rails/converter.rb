@@ -62,6 +62,7 @@ module GoOnRails
       assoc = get_associations
       struct_info[:struct_body] << assoc[:struct_body]
       struct_info[:assoc_info] = assoc[:assoc_info]
+      struct_info[:has_assoc_dependent] = assoc[:has_assoc_dependent]
       return struct_info
     end
 
