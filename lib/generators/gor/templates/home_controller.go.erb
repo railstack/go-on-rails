@@ -23,7 +23,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	gorVer := "<%= Gem.loaded_specs["go-on-rails"].version.to_s rescue "Failed to get" %>"
-    golangVer := "<%= `go version`.chomp rescue "Failed to get" %>"
+	golangVer := "<%= `go version`.chomp rescue "Failed to get" %>"
 
 	envs := Envs{GoOnRailsVer: gorVer, GolangVer: golangVer}
 	t, _ := template.ParseFiles("views/index.tmpl")
