@@ -52,7 +52,7 @@ class GorGenerator < Rails::Generators::Base
       template "db.go.erb", "go_app/models/db.go"
 
       # generate the controllers and views dir
-      copy_file "home_controller.go", "go_app/controllers/home_controller.go"
+      template "home_controller.go.erb", "go_app/controllers/home_controller.go"
       copy_file "index.tmpl", "go_app/views/index.tmpl"
       copy_file "favicon.ico", "go_app/public/favicon.ico"
     end

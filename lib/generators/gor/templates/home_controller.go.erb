@@ -17,11 +17,15 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	// 	u = []byte("Get data error!")
 	// }
 
-	type Greeting struct {
-		Name  string
-		Words string
+	type Envs struct {
+		GoOnRailsVer string
+		GolangVer    string
 	}
-	greeting := Greeting{Name: "Rubyist", Words: "Welcome to GoOnRails!"}
+
+	gorVer := "<%= Gem.loaded_specs["go-on-rails"].version.to_s rescue "Failed to get" %>"
+    golangVer := "<%= `go version`.chomp rescue "Failed to get" %>"
+
+	envs := Envs{GoOnRailsVer: gorVer, GolangVer: golangVer}
 	t, _ := template.ParseFiles("views/index.tmpl")
-	t.Execute(w, greeting)
+	t.Execute(w, envs)
 }
