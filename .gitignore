@@ -6,6 +6,7 @@
 /test/version_tmp/
 /tmp/
 /log/
+/go_app/
 
 ## Specific to RubyMotion:
 .dat*
