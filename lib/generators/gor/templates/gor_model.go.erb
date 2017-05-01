@@ -118,30 +118,42 @@ func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interf
 				<%- has_many = @struct_info[:assoc_info][:has_many] -%>
 				<%- has_many.each do |k, v| -%>
 				case "<%= k.underscore.pluralize %>":
-					<%- if v[:foreign_key] -%>
-						where := fmt.Sprintf("<%= v[:foreign_key] %> IN (?%s)", idsHolder)
-					<%- else -%>
-						where := fmt.Sprintf("<%= model_name_underscore %>_id IN (?%s)", idsHolder)
-					<%- end -%>
-					var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>Where(where, ids...)
-					if err != nil {
-						log.Printf("Error when query associated objects: %v\n", assoc)
-						continue
-					}
-					for _, vv := range var_<%= v[:class_name].underscore.pluralize %> {
+				    <%- if v[:through] -%>
+						// FIXME: optimize the query
 						for i, vvv := range  var_<%= param_name_plural %> {
-							<%- if v[:foreign_key] -%>
-								if vv.<%= v[:foreign_key].camelize %> == vvv.Id {
-									vvv.<%= k %> = append(vvv.<%= k %>, vv)
-								}
-							<%- else -%>
-								if vv.<%= @model_name.camelize %>Id == vvv.Id {
-									vvv.<%= k %> = append(vvv.<%= k %>, vv)
-								}
-							<%- end -%>
-							var_<%= param_name_plural %>[i].<%= k %> = vvv.<%= k %>
+							var_<%= v[:class_name].underscore.pluralize %>, err := <%= @model_name %>Get<%= v[:class_name].pluralize %>(vvv.Id)
+							if err != nil {
+								continue
+							}
+							vvv.<%= k %> = var_<%= v[:class_name].underscore.pluralize %>
+						    var_<%= param_name_plural %>[i] = vvv
 						}
-					}
+					<%- else -%>
+						<%- if v[:foreign_key] -%>
+							where := fmt.Sprintf("<%= v[:foreign_key] %> IN (?%s)", idsHolder)
+						<%- else -%>
+							where := fmt.Sprintf("<%= model_name_underscore %>_id IN (?%s)", idsHolder)
+						<%- end -%>
+						var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>Where(where, ids...)
+						if err != nil {
+							log.Printf("Error when query associated objects: %v\n", assoc)
+							continue
+						}
+						for _, vv := range var_<%= v[:class_name].underscore.pluralize %> {
+							for i, vvv := range  var_<%= param_name_plural %> {
+								<%- if v[:foreign_key] -%>
+									if vv.<%= v[:foreign_key].camelize %> == vvv.Id {
+										vvv.<%= k %> = append(vvv.<%= k %>, vv)
+									}
+								<%- else -%>
+									if vv.<%= @model_name.camelize %>Id == vvv.Id {
+										vvv.<%= k %> = append(vvv.<%= k %>, vv)
+									}
+								<%- end -%>
+								var_<%= param_name_plural %>[i].<%= k %> = vvv.<%= k %>
+						    }
+					    }
+				    <%- end -%>
 				<%- end -%>
 			<%- end -%>
 			<%- unless @struct_info[:assoc_info][:has_one].empty? -%>
@@ -340,25 +352,30 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) <%= v[:class_name].p
 }
 
 func (var_<%= model_name_underscore %> *<%= @model_name %>) Get<%= v[:class_name].pluralize %>() error {
-	<%- if v[:through] -%>
-		// FIXME: use transaction to create these associated objects
-		<%= v[:class_name].underscore %>_ids, err := <%= v[:through].to_s.singularize.camelize %>IntCol("<%= v[:class_name].underscore %>_id", "<%= model_name_underscore %>_id = ?", var_<%= model_name_underscore %>.Id)
-		if err != nil {
-			return err
-		}
-		var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>(<%= v[:class_name].underscore %>_ids...)
-	<%- else -%>
-		<%- if v[:foreign_key] -%>
-			var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>By("<%= v[:foreign_key] %>", var_<%= model_name_underscore %>.Id)
-		<%- else -%>
-			var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>By("<%= model_name_underscore %>_id", var_<%= model_name_underscore %>.Id)
-		<%- end -%>
-	<%- end -%>
+	var_<%= v[:class_name].underscore.pluralize %>, err := <%= @model_name %>Get<%= v[:class_name].pluralize %>(var_<%= model_name_underscore %>.Id)
 	if err == nil {
 		var_<%= model_name_underscore %>.<%= k %> = var_<%= v[:class_name].underscore.pluralize %>
     }
     return err
 }
+
+func <%= @model_name %>Get<%= v[:class_name].pluralize %>(id int64) ([]<%= v[:class_name] %>, error) {
+	<%- if v[:through] -%>
+		// FIXME: use transaction to create these associated objects
+		<%- target_table = v[:class_name].underscore.pluralize -%>
+		<%- through_table = v[:through].to_s.pluralize -%>
+		sql := "SELECT `<%= target_table %>`.* FROM `<%= target_table %>` INNER JOIN `<%= through_table %>` ON `<%= target_table %>`.`id` = `<%= through_table %>`.`<%= v[:class_name].underscore %>_id` WHERE `<%= through_table %>`.`<%= model_name_underscore %>_id` = ?"
+		var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>BySql(sql, id)
+	<%- else -%>
+		<%- if v[:foreign_key] -%>
+			var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>By("<%= v[:foreign_key] %>", id)
+		<%- else -%>
+			var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>By("<%= model_name_underscore %>_id", id)
+		<%- end -%>
+	<%- end -%>
+	return var_<%= v[:class_name].underscore.pluralize %>, err
+}
+
 	<%- end -%>
 <%- end -%>
 
