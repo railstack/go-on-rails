@@ -10,7 +10,7 @@
 ## Ignore generated Golang files
 ## Except the testing ones
 /go_app/
-!/go_app/models/model_test.go
+!/go_app/models/models_test.go
 
 ## Specific to RubyMotion:
 .dat*
