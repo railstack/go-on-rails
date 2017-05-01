@@ -86,7 +86,7 @@ When I had the idea to convert Rails app or build Golang app with Rails tools, I
 
 There're two branches at present: `master` and `dev`.
 
-The branch `master` has the files only for the generator needs, as the `dev` branch has a whole Rails environment for development: models, seeds for testing, and under `go_app` directory there's a file named `modles_test.go` used to test generated Golang codes.
+The `dev` branch has a whole Rails environment for development: models, seeds for testing, and under `go_app` directory there's a file named `modles_test.go` used to test generated Golang codes.
 
 - Fork the project switch to branch `dev`.
 - Make your feature addition or bug fix.
