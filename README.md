@@ -21,7 +21,7 @@ One or more examples will be given later on.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'go-on-rails', '~> 0.0.6'
+gem 'go-on-rails', '~> 0.0.7'
 ```
 
 And then execute:
@@ -84,7 +84,11 @@ When I had the idea to convert Rails app or build Golang app with Rails tools, I
 
 ## Contributing
 
-- Fork the project.
+There're two branches at present: `master` and `dev`.
+
+The branch `master` has the files only for the generator needs, as the `dev` branch has a whole Rails environment for development: models, seeds for testing, and under `go_app` directory there's a file named `modles_test.go` used to test generated Golang codes.
+
+- Fork the project switch to branch `dev`.
 - Make your feature addition or bug fix.
 - Add tests for it. This is important so I don't break it in a future version unintentionally.
 - Commit, do not mess with Rakefile or version (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
