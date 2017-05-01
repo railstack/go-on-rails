@@ -97,4 +97,4 @@ class GorGenerator < Rails::Generators::Base
   end
 end
 
-require_relative 'go_on_rails/converter'
+require_relative 'go-on-rails/converter'
