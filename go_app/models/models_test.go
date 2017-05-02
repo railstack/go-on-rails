@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
+// TestFindPhysicianBy test the function FindPhysicianBy()
 func TestFindPhysicianBy(t *testing.T) {
 	p, err := FindPhysicianBy("name", "TuoHua")
 	if err != nil {
@@ -14,6 +15,22 @@ func TestFindPhysicianBy(t *testing.T) {
 	}
 }
 
+// TestFindPhysician test the function FindPhysician()
+func TestFindPhysician(t *testing.T) {
+	p, err := FindPhysicianBy("name", "TuoHua")
+	if err != nil {
+		t.Error(err)
+	}
+	pp, err := FindPhysician(p.Id)
+	if err != nil {
+		t.Error(err)
+	}
+	if p.Name != pp.Name {
+		t.Error("FindPhysician error!")
+	}
+}
+
+// TestPhysicianGetPatients test the method GetPatients()
 func TestPhysicianGetPatients(t *testing.T) {
 	p, err := FindPhysicianBy("name", "TuoHua")
 	if err != nil {
@@ -28,6 +45,7 @@ func TestPhysicianGetPatients(t *testing.T) {
 	}
 }
 
+// TestPhysicianIncludesWhere test the method PhysicianIncludesWhere()
 func TestPhysicianIncludesWhere(t *testing.T) {
 	ps, err := PhysicianIncludesWhere([]string{"patients"}, "name = ?", "TuoHua")
 	if err != nil {
