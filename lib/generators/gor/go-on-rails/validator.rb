@@ -44,9 +44,13 @@ module GoOnRails
             rules << "IsNumeric"
           end
         when "ActiveRecord::Validations::LengthValidator"
-          if validator.options && (['string', 'text'].include? col.type.to_s)
-            min = validator.options[:minimum] ? validator.options[:minimum] : 0
-            max = validator.options[:maximum] ? validator.options[:maximum] : 4_294_967_295
+          if validator.options && ['string', 'text'].include?(col.type.to_s)
+            if validator.options[:is]
+              min = max = validator.options[:is]
+            else
+              min = validator.options[:minimum] ? validator.options[:minimum] : 0
+              max = validator.options[:maximum] ? validator.options[:maximum] : 4_294_967_295
+            end
             rules << sprintf("length(%d|%d)", min, max)
           end
         end
