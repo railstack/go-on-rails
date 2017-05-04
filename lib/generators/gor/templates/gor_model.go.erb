@@ -16,6 +16,8 @@ import (
 	<%- if @struct_info[:has_datetime_type] -%>
 	"time"
     <%- end -%>
+
+	"github.com/asaskevich/govalidator"
 )
 
 type <%= @model_name %> struct {
@@ -318,6 +320,15 @@ func Create<%= @model_name %>(am map[string]interface{}) (int64, error) {
 }
 
 func (var_<%= model_name_underscore %> *<%= @model_name %>) Create() error {
+	ok, err := govalidator.ValidateStruct(var_<%= model_name_underscore %>)
+	if !ok {
+		errMsg := "Validate <%= @model_name %> struct error: Unknown error"
+		if err != nil {
+			errMsg = "Validate <%= @model_name %> struct error: " + err.Error()
+		}
+		log.Println(errMsg)
+		return errors.New(errMsg)
+	}
 <%- unless @struct_info[:timestamp_cols].empty? -%>
 	t := time.Now()
 	<%- @struct_info[:timestamp_cols].each do |c| -%>
@@ -325,7 +336,7 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) Create() error {
     <%- end -%>
 <%- end -%>
     sql := `INSERT INTO <%= table_name %> (<%= col_names.join(",") %>) VALUES (:<%= col_names.join(",:") %>)`
-    _, err := db.NamedExec(sql, var_<%= model_name_underscore %>)
+    _, err = db.NamedExec(sql, var_<%= model_name_underscore %>)
     return err
 }
 

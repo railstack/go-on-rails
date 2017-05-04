@@ -33,12 +33,13 @@ module GoOnRails
 
       self.max_col_size = get_max_col_size
       self.max_type_size = get_max_type_size
+      validation = GoOnRails::Validator.new(self.klass)
 
       self.klass.columns.each_with_index do |col, index|
         tags = []
 
         # add struct tag
-        tags << struct_tag(col)
+        tags << struct_tag(col, validation)
 
         col_type = col.type.to_s
         struct_info[:has_datetime_type] = true if %w(datetime time).include? col_type
@@ -88,11 +89,12 @@ module GoOnRails
       builder.get_schema_info
     end
 
-    def struct_tag(col)
-      "json:\"#{col.name},omitempty\" db:\"#{col.name}\""
+    def struct_tag(col, validation)
+      valid_tags = validation.build_validator_tag(col)
+      "json:\"#{col.name},omitempty\" db:\"#{col.name}\" #{valid_tags}"
     end
-
   end
 end
 
 require_relative 'association'
+require_relative 'validator'

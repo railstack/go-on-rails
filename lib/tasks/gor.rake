@@ -8,7 +8,8 @@ namespace :gor do
     github.com/gorilla/mux \
     github.com/mattn/go-sqlite3 \
     github.com/go-sql-driver/mysql \
-    github.com/lib/pq"
+    github.com/lib/pq \
+    github.com/asaskevich/govalidator"
     puts 'Installation completed!'
   end
 end
