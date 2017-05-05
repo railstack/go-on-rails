@@ -4,7 +4,7 @@
 #
 #  id               :integer          not null, primary key
 #  appointment_date :datetime
-#  phisician_id     :integer
+#  physician_id     :integer
 #  patient_id       :integer
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
