@@ -43,6 +43,12 @@ module GoOnRails
           else
             rules << "IsNumeric"
           end
+        when "ActiveModel::Validations::InclusionValidator"
+          [:in, :within].each do |i|
+            if validator.options && validator.options[i]
+              rules << "in(#{validator.options[i].join('|')})" if ['string', 'text'].include?(col.type.to_s)
+            end
+          end
         when "ActiveRecord::Validations::LengthValidator"
           if validator.options && ['string', 'text'].include?(col.type.to_s)
             if validator.options[:is]
