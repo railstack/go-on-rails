@@ -572,6 +572,15 @@ func destroy<%= @model_name %>Associations(ids ...int64) {
 <%- end -%>
 
 func (var_<%= model_name_underscore %> *<%= @model_name %>) Save() error {
+	ok, err := govalidator.ValidateStruct(var_<%= model_name_underscore %>)
+	if !ok {
+		errMsg := "Validate <%= @model_name %> struct error: Unknown error"
+		if err != nil {
+			errMsg = "Validate <%= @model_name %> struct error: " + err.Error()
+		}
+		log.Println(errMsg)
+		return errors.New(errMsg)
+	}
 	if var_<%= model_name_underscore %>.Id == 0 {
 		return errors.New("Invalid Id field: it can't be a zero value")
 	}
@@ -581,7 +590,7 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) Save() error {
 	sqlFmt := `UPDATE <%= table_name %> SET %s WHERE id = %v`
 	<%- save_col_names = col_names - ["created_at"] -%>
 	sqlStr := fmt.Sprintf(sqlFmt, "<%= save_col_names.zip(save_col_names).map{|c| c.join(" = :")}.join(", ") %>", var_<%= model_name_underscore %>.Id)
-    _, err := db.NamedExec(sqlStr, var_<%= model_name_underscore %>)
+    _, err = db.NamedExec(sqlStr, var_<%= model_name_underscore %>)
     return err
 }
 
