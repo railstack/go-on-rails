@@ -38,6 +38,52 @@ func Find<%= @model_name %>(id int64) (*<%= @model_name %>, error) {
 	return &var_<%= model_name_underscore %>, nil
 }
 
+// First<%= @model_name %> find the first one <%= model_name_underscore %> by id ASC order
+func First<%= @model_name %>() (*<%= @model_name %>, error) {
+	var_<%= model_name_underscore %> := <%= @model_name %>{}
+	err := db.Get(&var_<%= model_name_underscore %>, db.Rebind(`SELECT * FROM <%= table_name %> ORDER BY id ASC LIMIT 1`))
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+		return nil, err
+	}
+	return &var_<%= model_name_underscore %>, nil
+}
+
+// First<%= @model_name.pluralize %> find the first N <%= model_name_underscore.pluralize %> by id ASC order
+func First<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
+	var_<%= param_name_plural %> := []<%= @model_name %>{}
+	sql := fmt.Sprintf("SELECT * FROM <%= table_name %> ORDER BY id ASC LIMIT %v", n)
+	err := db.Select(&var_<%= param_name_plural %>, db.Rebind(sql))
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+		return nil, err
+	}
+	return var_<%= param_name_plural %>, nil
+}
+
+// Last<%= @model_name %> find the last one <%= model_name_underscore %> by id DESC order
+func Last<%= @model_name %>() (*<%= @model_name %>, error) {
+	var_<%= model_name_underscore %> := <%= @model_name %>{}
+	err := db.Get(&var_<%= model_name_underscore %>, db.Rebind(`SELECT * FROM <%= table_name %> ORDER BY id DESC LIMIT 1`))
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+		return nil, err
+	}
+	return &var_<%= model_name_underscore %>, nil
+}
+
+// Last<%= @model_name.pluralize %> find the last N <%= model_name_underscore.pluralize %> by id DESC order
+func Last<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
+	var_<%= param_name_plural %> := []<%= @model_name %>{}
+	sql := fmt.Sprintf("SELECT * FROM <%= table_name %> ORDER BY id DESC LIMIT %v", n)
+	err := db.Select(&var_<%= param_name_plural %>, db.Rebind(sql))
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+		return nil, err
+	}
+	return var_<%= param_name_plural %>, nil
+}
+
 // Find<%= @model_name.pluralize %> find one or more <%= model_name_underscore.pluralize %> by one or more ids
 func Find<%= @model_name.pluralize %>(ids ...int64) ([]<%= @model_name %>, error) {
 	if len(ids) == 0 {

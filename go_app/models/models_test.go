@@ -83,7 +83,7 @@ func TestPhysicianCreateValidationPass(t *testing.T) {
 	}
 	p, err = FindPhysicianBy("name", "New Doctor")
 	if err != nil {
-		t.Error("Create Physician Failure")
+		t.Error("Create physician failure")
 	}
 }
 
@@ -91,12 +91,64 @@ func TestPhysicianCreateValidationPass(t *testing.T) {
 func TestDestroyPhysician(t *testing.T) {
 	p, err := FindPhysicianBy("name", "New Doctor")
 	if err != nil {
-		t.Error("Create Physician Failure")
+		t.Error("Create physician failure")
 	}
 	fmt.Printf("New Physician is: %v\n", p.Name)
 	err = DestroyPhysician(p.Id)
 	if err != nil {
-		t.Error("Delete Physician Failure")
+		t.Error("Delete physician failure")
 	}
 	fmt.Printf("A physician %v is deleted\n", p.Name)
+}
+
+// TestFirstPhysician test the function TestFirstPhysician()
+func TestFirstPhysician(t *testing.T) {
+	p, err := FirstPhysician()
+	if err != nil {
+		t.Error("Find first physician failure")
+	}
+	if p.Name == "ShizhenLi" {
+		fmt.Printf("The First Physician is: %v\n", p.Name)
+	} else {
+		t.Error("The First Physician record is not right")
+	}
+}
+
+// TestFirstPhysicians test the function TestFirstPhysician()
+func TestFirstPhysicians(t *testing.T) {
+	ps, err := FirstPhysicians(3)
+	if err != nil {
+		t.Error("Get the First 3 Physicians failed")
+	}
+	if len(ps) == 3 {
+		fmt.Println("Get the First 3 Physicians success")
+	} else {
+		t.Error("Get the First 3 Physicians failed")
+	}
+}
+
+// TestLastPhysician test the function TestLastPhysician()
+func TestLastPhysician(t *testing.T) {
+	p, err := LastPhysician()
+	if err != nil {
+		t.Error("Find Last physician failure")
+	}
+	if p.Name == "TuoHua" {
+		fmt.Printf("The Last Physician is: %v\n", p.Name)
+	} else {
+		t.Error("The Last Physician record is not right")
+	}
+}
+
+// TestLastPhysicians test the function TestLastPhysician()
+func TestLastPhysicians(t *testing.T) {
+	ps, err := LastPhysicians(3)
+	if err != nil {
+		t.Error("Get the Last 3 Physicians failed")
+	}
+	if len(ps) == 3 {
+		fmt.Println("Get the Last 3 Physicians success")
+	} else {
+		t.Error("Get the Last 3 Physicians failed")
+	}
 }
