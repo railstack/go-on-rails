@@ -475,15 +475,16 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) Destroy() error {
 }
 
 func Destroy<%= @model_name %>(id int64) error {
+	<%- if @struct_info[:has_assoc_dependent] -%>
+	// Destroy association objects at first
+	// Not care if exec properly temporarily
+	destroy<%= @model_name %>Associations(id)
+    <%- end -%>
 	stmt, err := db.Preparex(db.Rebind(`DELETE FROM <%= table_name %> WHERE id = ?`))
 	_, err = stmt.Exec(id)
 	if err != nil {
 		return err
 	}
-	<%- if @struct_info[:has_assoc_dependent] -%>
-	// not care if exec properly temporarily
-	destroy<%= @model_name %>Associations(id)
-    <%- end -%>
 	return nil
 }
 
@@ -493,6 +494,11 @@ func Destroy<%= @model_name.pluralize %>(ids ...int64) (int64, error) {
 		log.Println(msg)
 		return 0, errors.New(msg)
 	}
+	<%- if @struct_info[:has_assoc_dependent] -%>
+	// Destroy association objects at first
+	// Not care if exec properly temporarily
+	destroy<%= @model_name %>Associations(ids...)
+	<%- end -%>
 	idsHolder := strings.Repeat(",?", len(ids)-1)
 	sql := fmt.Sprintf(`DELETE FROM <%= table_name %> WHERE id IN (?%s)`, idsHolder)
 	idsT := []interface{}{}
@@ -508,10 +514,6 @@ func Destroy<%= @model_name.pluralize %>(ids ...int64) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	<%- if @struct_info[:has_assoc_dependent] -%>
-	// not care if exec properly temporarily
-	destroy<%= @model_name %>Associations(ids...)
-	<%- end -%>
 	return cnt, nil
 }
 
@@ -527,6 +529,11 @@ func Destroy<%= @model_name.pluralize %>Where(where string, args ...interface{})
 	}
 	<%- if @struct_info[:has_assoc_dependent] -%>
 	ids, x_err := <%= @model_name %>IdsWhere(where, args...)
+	if x_err != nil {
+		log.Printf("Delete associated objects error: %v\n", x_err)
+	} else {
+		destroy<%= @model_name %>Associations(ids...)
+	}
 	<%- end -%>
 	stmt, err := db.Preparex(db.Rebind(sql))
 	result, err := stmt.Exec(args...)
@@ -537,13 +544,6 @@ func Destroy<%= @model_name.pluralize %>Where(where string, args ...interface{})
 	if err != nil {
 		return 0, err
 	}
-	<%- if @struct_info[:has_assoc_dependent] -%>
-	if x_err != nil {
-		log.Printf("Delete associated objects error: %v\n", err)
-	} else {
-		destroy<%= @model_name %>Associations(ids...)
-	}
-	<%- end -%>
 	return cnt, nil
 }
 
