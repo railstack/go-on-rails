@@ -4,8 +4,7 @@ namespace :gor do
     puts 'Beginning to install Go deps...'
     system "go get \
     github.com/jmoiron/sqlx \
-    github.com/gorilla/handlers \
-    github.com/gorilla/mux \
+    gopkg.in/gin-gonic/gin.v1 \
     github.com/mattn/go-sqlite3 \
     github.com/go-sql-driver/mysql \
     github.com/lib/pq \
