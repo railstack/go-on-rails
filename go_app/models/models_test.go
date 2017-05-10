@@ -61,7 +61,7 @@ func TestPhysicianIncludesWhere(t *testing.T) {
 // The name "Jack" can't pass string length restrict validation: 4 is not range in 6..15
 func TestPhysicianCreateValidationFail(t *testing.T) {
 	p := &Physician{Name: "Jack", Introduction: "Jack is a new Doctor."}
-	err := p.Create()
+	_, err := p.Create()
 	if err != nil {
 		fmt.Printf("Create Physician Failure: %v\n", err)
 	} else {
@@ -77,11 +77,11 @@ func TestPhysicianCreateValidationFail(t *testing.T) {
 // The name "New Doctor" can pass string length restrict validation: 10 is in range 6..15
 func TestPhysicianCreateValidationPass(t *testing.T) {
 	p := &Physician{Name: "New Doctor", Introduction: "A new doctor is welcomed!"}
-	err := p.Create()
+	id, err := p.Create()
 	if err != nil {
 		t.Error(err)
 	}
-	p, err = FindPhysicianBy("name", "New Doctor")
+	p, err = FindPhysician(id)
 	if err != nil {
 		t.Error("Create physician failure")
 	}

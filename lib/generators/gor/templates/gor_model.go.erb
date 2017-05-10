@@ -365,7 +365,7 @@ func Create<%= @model_name %>(am map[string]interface{}) (int64, error) {
 	return lastId, nil
 }
 
-func (var_<%= model_name_underscore %> *<%= @model_name %>) Create() error {
+func (var_<%= model_name_underscore %> *<%= @model_name %>) Create() (int64, error) {
 	ok, err := govalidator.ValidateStruct(var_<%= model_name_underscore %>)
 	if !ok {
 		errMsg := "Validate <%= @model_name %> struct error: Unknown error"
@@ -373,7 +373,7 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) Create() error {
 			errMsg = "Validate <%= @model_name %> struct error: " + err.Error()
 		}
 		log.Println(errMsg)
-		return errors.New(errMsg)
+		return 0, errors.New(errMsg)
 	}
 <%- unless @struct_info[:timestamp_cols].empty? -%>
 	t := time.Now()
@@ -382,8 +382,17 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) Create() error {
     <%- end -%>
 <%- end -%>
     sql := `INSERT INTO <%= table_name %> (<%= col_names.join(",") %>) VALUES (:<%= col_names.join(",:") %>)`
-    _, err = db.NamedExec(sql, var_<%= model_name_underscore %>)
-    return err
+    result, err := db.NamedExec(sql, var_<%= model_name_underscore %>)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	lastId, err := result.LastInsertId()
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	return lastId, nil
 }
 
 <%- unless @struct_info[:assoc_info][:has_many].empty? -%>
