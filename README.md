@@ -21,7 +21,7 @@ One or more examples will be given later on.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'go-on-rails', '~> 0.0.8'
+gem 'go-on-rails', '~> 0.0.9'
 ```
 
 And then execute:
