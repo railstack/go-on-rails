@@ -1,13 +1,14 @@
 package controller
 
 import (
-	"html/template"
 	"net/http"
+
+	"gopkg.in/gin-gonic/gin.v1"
 	// you can import models
 	//m "../models"
 )
 
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
+func HomeHandler(c *gin.Context) {
 	// you can use model functions to do CRUD
 	//
 	// user, _ := m.FindUser(1)
@@ -26,6 +27,5 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	golangVer := "<%= `go version`.chomp rescue "Failed to get" %>"
 
 	envs := Envs{GoOnRailsVer: gorVer, GolangVer: golangVer}
-	t, _ := template.ParseFiles("views/index.tmpl")
-	t.Execute(w, envs)
+	c.HTML(http.StatusOK, "index.tmpl", envs)
 }
