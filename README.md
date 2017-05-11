@@ -79,6 +79,15 @@ And the gem is still under development, so there're a lot of known issues.
 
 Really a lot...
 
+## Golang packages by default
+
+* github.com/jmoiron/sqlx: an extension on the standard `database/sql` Database API library
+* github.com/mattn/go-sqlite3: a SQLite driver
+* github.com/go-sql-driver/mysql: a MySQL driver
+* github.com/lib/pq: a PostgreSQL driver
+* github.com/asaskevich/govalidator: for the struct validation
+* gopkg.in/gin-gonic/gin.v1: a HTTP web framework
+
 ## Acknowledgement
 
 When I had the idea to convert Rails app or build Golang app with Rails tools, I searched github and found the project: https://github.com/t-k/ar2gostruct. And from ar2gostruct I copied some codes on handling data structure convertion and models association, it make my idea come true faster than I imagined.
