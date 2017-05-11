@@ -79,7 +79,7 @@ And the gem is still under development, so there're a lot of known issues.
 
 Really a lot...
 
-## Golang packages by default
+## Golang dependencies by default
 
 * `github.com/jmoiron/sqlx`: an extension on the standard `database/sql` database API library
 * `github.com/mattn/go-sqlite3`: a SQLite driver
