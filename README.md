@@ -81,12 +81,12 @@ Really a lot...
 
 ## Golang packages by default
 
-* github.com/jmoiron/sqlx: an extension on the standard `database/sql` Database API library
-* github.com/mattn/go-sqlite3: a SQLite driver
-* github.com/go-sql-driver/mysql: a MySQL driver
-* github.com/lib/pq: a PostgreSQL driver
-* github.com/asaskevich/govalidator: for the struct validation
-* gopkg.in/gin-gonic/gin.v1: a HTTP web framework
+* `github.com/jmoiron/sqlx`: an extension on the standard `database/sql` Database API library
+* `github.com/mattn/go-sqlite3`: a SQLite driver
+* `github.com/go-sql-driver/mysql`: a MySQL driver
+* `github.com/lib/pq`: a PostgreSQL driver
+* `github.com/asaskevich/govalidator`: for the struct validation
+* `gopkg.in/gin-gonic/gin.v1`: a HTTP web framework
 
 ## Acknowledgement
 
