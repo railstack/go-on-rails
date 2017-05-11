@@ -9,7 +9,7 @@ go-on-rails aims at three scenarios:
 2. Use your farmiliar Rails tools to develope and manage a Golang app project
 3. Convert a *not very complicated* Rails app to Golang equivalent
 
-One or more examples will be given later on.
+Here's a simple [example(tutorial)](https://github.com/goonr/example_simple) shows the basic usage of go-on-rails generator, and some real-world examples are coming soon.
 
 ## Prerequisites
 
