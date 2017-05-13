@@ -51,7 +51,7 @@ Install the dependent Golang packages:
 rails gor:deps
 ```
 
-Then change to the "go_app" directory and run:
+Then change to the `go_app` directory and run:
 
 ```bash
 go run main.go
@@ -64,6 +64,13 @@ More command details about go-on-rails generator:
 ```bash
 rails g gor --help
 ```
+
+## What will be generated?
+
+* Go project directory layout (all under the `go_app` directory, like `views`, `controllers`, `public`)
+* A Go data struct corresponding to each activerecord model
+* And each struct related CRUD functions/methods like FindModel, UpdateModel, DestroyModle etc. All these models related program files under the `go_app/models` directory
+* We use [Gin](https://github.com/gin-gonic/gin) as the default web framework, but you can change it to anyone that you favor in `main.go` and `controllers` programs
 
 And the gem is still under development, so there're a lot of known issues.
 
