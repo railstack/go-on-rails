@@ -101,7 +101,7 @@ func TestDestroyPhysician(t *testing.T) {
 	fmt.Printf("A physician %v is deleted\n", p.Name)
 }
 
-// TestFirstPhysician test the function TestFirstPhysician()
+// TestFirstPhysician test the function FirstPhysician()
 func TestFirstPhysician(t *testing.T) {
 	p, err := FirstPhysician()
 	if err != nil {
@@ -114,7 +114,7 @@ func TestFirstPhysician(t *testing.T) {
 	}
 }
 
-// TestFirstPhysicians test the function TestFirstPhysician()
+// TestFirstPhysicians test the function FirstPhysician()
 func TestFirstPhysicians(t *testing.T) {
 	ps, err := FirstPhysicians(3)
 	if err != nil {
@@ -127,7 +127,7 @@ func TestFirstPhysicians(t *testing.T) {
 	}
 }
 
-// TestLastPhysician test the function TestLastPhysician()
+// TestLastPhysician test the function LastPhysician()
 func TestLastPhysician(t *testing.T) {
 	p, err := LastPhysician()
 	if err != nil {
@@ -140,7 +140,7 @@ func TestLastPhysician(t *testing.T) {
 	}
 }
 
-// TestLastPhysicians test the function TestLastPhysician()
+// TestLastPhysicians test the function LastPhysician()
 func TestLastPhysicians(t *testing.T) {
 	ps, err := LastPhysicians(3)
 	if err != nil {
@@ -150,5 +150,31 @@ func TestLastPhysicians(t *testing.T) {
 		fmt.Println("Get the Last 3 Physicians success")
 	} else {
 		t.Error("Get the Last 3 Physicians failed")
+	}
+}
+
+// TestPhysicianCount test the function PhysicianCount
+func TestPhysicianCount(t *testing.T) {
+	c, err := PhysicianCount()
+	if err != nil {
+		t.Error("Phsicians count error")
+	}
+	if c == 4 {
+		fmt.Println("Get Physician count success")
+	} else {
+		t.Error("Get Physician count failed")
+	}
+}
+
+// TestPhysicianCountWhere test the function PhysicianCountWhere
+func TestPhysicianCountWhere(t *testing.T) {
+	c, err := PhysicianCountWhere("name = ?", "TuoHua")
+	if err != nil {
+		t.Error("Phsicians count error")
+	}
+	if c == 1 {
+		fmt.Println("Test PhysicianCountWhere success")
+	} else {
+		t.Error("Test PhysicianCountWhere success failed")
 	}
 }

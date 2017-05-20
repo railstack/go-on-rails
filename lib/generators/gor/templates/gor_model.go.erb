@@ -133,7 +133,7 @@ func Find<%= @model_name.pluralize %>By(field string, val interface{}) (var_<%= 
 
 // All<%= @model_name.pluralize %> get all the <%= @model_name %> records
 func All<%= @model_name.pluralize %>() (<%= param_name_plural %> []<%= @model_name %>, err error) {
-	err = db.Select(&<%= table_name %>, "SELECT * FROM <%= table_name %>")
+	err = db.Select(&<%= param_name_plural %>, "SELECT * FROM <%= table_name %>")
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -141,6 +141,36 @@ func All<%= @model_name.pluralize %>() (<%= param_name_plural %> []<%= @model_na
 	return <%= param_name_plural %>, nil
 }
 
+// <%= @model_name %>Count get the count of all the <%= @model_name %> records
+func <%= @model_name %>Count() (c int64, err error) {
+	err = db.Get(&c, "SELECT count(*) FROM <%= table_name %>")
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	return c, nil
+}
+
+// <%= @model_name %>CountWhere get the count of all the <%= @model_name %> records with a where clause
+func <%= @model_name %>CountWhere(where string, args ...interface{}) (c int64, err error) {
+	sql := "SELECT count(*) FROM <%= table_name %>"
+	if len(where) > 0 {
+		sql = sql + " WHERE " + where
+	}
+	stmt, err := db.Preparex(db.Rebind(sql))
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	err = stmt.Get(&c, args...)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	return c, nil
+}
+
+// <%= @model_name %>IncludesWhere get the <%= @model_name %> associated models records, it's just the eager_load function
 func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interface{}) (var_<%= param_name_plural %> []<%= @model_name %>, err error) {
 	var_<%= param_name_plural %>, err = Find<%= @model_name.pluralize %>Where(sql, args...)
 	if err != nil {
