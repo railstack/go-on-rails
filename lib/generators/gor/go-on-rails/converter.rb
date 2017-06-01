@@ -14,13 +14,11 @@ module GoOnRails
       "date"       => "time.Time"
     }
 
-    def initialize(klass, models, option = {})
+    def initialize(klass, models)
       @klass = klass
       @models = models
-      @max_col_size = 0
-      @max_type_size = 0
     end
-    attr_accessor :klass, :models, :max_col_size, :max_type_size
+    attr_accessor :klass, :models
 
     def convert
       get_schema_info
@@ -31,8 +29,6 @@ module GoOnRails
     def get_schema_info
       struct_info = {col_names: [], timestamp_cols: [], has_datetime_type: false, struct_body: ""}
 
-      self.max_col_size = get_max_col_size
-      self.max_type_size = get_max_type_size
       validation = GoOnRails::Validator.new(self.klass)
 
       self.klass.columns.each_with_index do |col, index|
@@ -55,9 +51,8 @@ module GoOnRails
           type = TYPE_MAP[col_type] || "string"
         end
 
-        format = (index == 0 ? "" : "\t") + "%-#{self.max_col_size}.#{self.max_col_size}s%-#{self.max_type_size}.#{self.max_type_size}s`%s`\n"
         struct_info[:col_names] << col.name unless col.name == "id"
-        struct_info[:struct_body] << sprintf(format, col.name.camelize, type, tags.join(" "))
+        struct_info[:struct_body] << sprintf("%s %s `%s`\n", col.name.camelize, type, tags.join(" "))
       end
 
       assoc = get_associations
@@ -67,25 +62,12 @@ module GoOnRails
       return struct_info
     end
 
-    def get_max_col_size
-      col_name_max_size = self.klass.column_names.collect{|name| name.size}.max || 0
-      assoc_max_size = self.klass.reflect_on_all_associations.collect{|assoc| assoc.name.to_s.size}.max || 0
-      type_max_size = TYPE_MAP.collect{|key, value| key.size}.max || 0
-      [col_name_max_size + 1, assoc_max_size, type_max_size].max
-    end
-
-    def get_max_type_size
-      assoc_max_size = self.klass.reflect_on_all_associations.collect{|assoc| assoc.name.to_s.size + 2}.max || 0
-      type_max_size = TYPE_MAP.collect{|key, value| key.size}.max || 0
-      [assoc_max_size, type_max_size].max
-    end
-
     def get_struct_name
       self.klass.table_name.camelize
     end
 
     def get_associations
-      builder = GoOnRails::Association.new(self.klass, self.models, self.max_col_size, self.max_type_size)
+      builder = GoOnRails::Association.new(self.klass, self.models)
       builder.get_schema_info
     end
 

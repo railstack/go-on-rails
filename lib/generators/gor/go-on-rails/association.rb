@@ -1,12 +1,10 @@
 module GoOnRails
   class Association
-    def initialize(klass, models, max_col_size, max_type_size)
+    def initialize(klass, models)
       @klass = klass
       @models = models
-      @max_col_size = max_col_size
-      @max_type_size = max_type_size
     end
-    attr_reader :klass, :models, :max_col_size, :max_type_size
+    attr_reader :klass, :models
 
     def get_schema_info
       info = {struct_body: "", has_assoc_dependent: false, assoc_info: {has_many: {}, has_one: {}, belongs_to: {}}}
@@ -32,8 +30,7 @@ module GoOnRails
         end
         info[:has_assoc_dependent] = true if assoc.options.key? :dependent
         if col_name && type_name && (self.models.include? class_name)
-          format = "\t%-#{max_col_size}.#{max_col_size+2}s%-#{max_type_size}.#{max_type_size}s`%s`\n"
-          info[:struct_body] << sprintf(format, col_name, type_name, tags.join(" "))
+          info[:struct_body] << sprintf("%s %s `%s`\n", col_name, type_name, tags.join(" "))
         end
       end
       info
