@@ -11,4 +11,9 @@ namespace :gor do
     github.com/asaskevich/govalidator"
     puts 'Installation completed!'
   end
+
+  task :fmt do
+    go_files = Rails.root.join('go_app', 'models/*.go').to_s
+    system "gofmt -w #{go_files} > /dev/null 2>&1"
+  end
 end
