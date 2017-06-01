@@ -12,6 +12,7 @@
 class Physician < ApplicationRecord
   has_many :appointments
   has_many :patients, through: :appointments
+  has_many :pictures, as: :imageable
 
   validates :name, presence: true, length: { in: 6..15 }
   validates :introduction, presence: true

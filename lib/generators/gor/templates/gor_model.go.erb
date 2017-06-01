@@ -196,7 +196,7 @@ func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interf
 				<%- has_many = @struct_info[:assoc_info][:has_many] -%>
 				<%- has_many.each do |k, v| -%>
 				case "<%= k.underscore.pluralize %>":
-				    <%- if v[:through] -%>
+				    <%- if v[:through] || v[:as] -%>
 						// FIXME: optimize the query
 						for i, vvv := range  var_<%= param_name_plural %> {
 							var_<%= v[:class_name].underscore.pluralize %>, err := <%= @model_name %>Get<%= v[:class_name].pluralize %>(vvv.Id)
@@ -428,6 +428,7 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) Create() (int64, err
 <%- unless @struct_info[:assoc_info][:has_many].empty? -%>
 	<%- has_many = @struct_info[:assoc_info][:has_many] -%>
 	<%- has_many.each do |k, v| -%>
+// <%= v[:class_name].pluralize %>Create used to create the associated objects
 func (var_<%= model_name_underscore %> *<%= @model_name %>) <%= v[:class_name].pluralize %>Create(am map[string]interface{}) error {
 	<%- if v[:through] -%>
 		// FIXME: use transaction to create these associated objects
@@ -436,6 +437,10 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) <%= v[:class_name].p
 			return err
 		}
 		_, err = Create<%= v[:through].to_s.singularize.camelize %>(map[string]interface{}{"<%= model_name_underscore %>_id": var_<%= model_name_underscore %>.Id, "<%= v[:class_name].underscore %>_id": <%= v[:class_name].underscore %>_id})
+	<%- elsif v[:as] -%>
+		am["<%= v[:as] %>_id"] = var_<%= model_name_underscore %>.Id
+		am["<%= v[:as] %>_type"] = "<%= @model_name %>"
+		_, err := Create<%= v[:class_name] %>(am)
 	<%- else -%>
 		<%- if v[:foreign_key] -%>
 			am["<%= v[:foreign_key] %>"] = var_<%= model_name_underscore %>.Id
@@ -447,6 +452,7 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) <%= v[:class_name].p
 	return err
 }
 
+// Get<%= v[:class_name].pluralize %> used to get associated objects
 func (var_<%= model_name_underscore %> *<%= @model_name %>) Get<%= v[:class_name].pluralize %>() error {
 	var_<%= v[:class_name].underscore.pluralize %>, err := <%= @model_name %>Get<%= v[:class_name].pluralize %>(var_<%= model_name_underscore %>.Id)
 	if err == nil {
@@ -455,13 +461,21 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) Get<%= v[:class_name
     return err
 }
 
+// <%= @model_name %>Get<%= v[:class_name].pluralize %> a helper fuction used to get associated objects for <%= @model_name %>IncludesWhere()
 func <%= @model_name %>Get<%= v[:class_name].pluralize %>(id int64) ([]<%= v[:class_name] %>, error) {
 	<%- if v[:through] -%>
 		// FIXME: use transaction to create these associated objects
 		<%- target_table = v[:class_name].underscore.pluralize -%>
 		<%- through_table = v[:through].to_s.pluralize -%>
-		sql := "SELECT `<%= target_table %>`.* FROM `<%= target_table %>` INNER JOIN `<%= through_table %>` ON `<%= target_table %>`.`id` = `<%= through_table %>`.`<%= v[:class_name].underscore %>_id` WHERE `<%= through_table %>`.`<%= model_name_underscore %>_id` = ?"
+		sql := `SELECT <%= target_table %>.*
+		        FROM   <%= target_table %>
+		               INNER JOIN <%= through_table %>
+		                       ON <%= target_table %>.id = <%= through_table %>.<%= v[:class_name].underscore %>_id
+		        WHERE <%= through_table %>.<%= model_name_underscore %>_id = ?`
 		var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>BySql(sql, id)
+	<%- elsif v[:as] -%>
+		where := `<%= v[:as] %>_type = "<%= @model_name %>" AND <%= v[:as] %>_id = ?`
+		var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>Where(where, id)
 	<%- else -%>
 		<%- if v[:foreign_key] -%>
 			var_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>By("<%= v[:foreign_key] %>", id)
@@ -493,6 +507,8 @@ func (var_<%= model_name_underscore %> *<%= @model_name %>) Create<%= v[:class_n
 <%- unless @struct_info[:assoc_info][:belongs_to].empty? -%>
 	<%- belongs_to = @struct_info[:assoc_info][:belongs_to] -%>
 	<%- belongs_to.each do |k, v| -%>
+    <%-# don't create virtual table for polymorphic model -%>
+	<%- next if v[:polymorphic] -%>
 func (var_<%= model_name_underscore %> *<%= @model_name %>) Create<%= v[:class_name] %>(am map[string]interface{}) error {
 	<%- if v[:foreign_key] -%>
 	am["<%= v[:foreign_key] %>"] = var_<%= model_name_underscore %>.Id
@@ -608,23 +624,29 @@ func destroy<%= @model_name %>Associations(ids ...int64) {
 					<%- case opts[:dependent] -%>
 					<%- when :destroy, :delete_all -%>
 						<%- if opts[:through] -%>
-							sql := fmt.Sprintf("id IN (SELECT id FROM <%= opts[:through].to_s %> WHERE <%= model_name_underscore %>_id IN (?%s))", idsHolder)
-							_, err = Destroy<%= opts[:class_name].pluralize %>Where(sql, idsT...)
+							where := fmt.Sprintf("id IN (SELECT id FROM <%= opts[:through].to_s %> WHERE <%= model_name_underscore %>_id IN (?%s))", idsHolder)
+							_, err = Destroy<%= opts[:class_name].pluralize %>Where(where, idsT...)
 							if err != nil {
 								log.Printf("Destroy associated object %s error: %v\n", "<%= opts[:class_name].pluralize %>", err)
 							}
-							sql = fmt.Sprintf("<%= model_name_underscore %>_id IN (?%s)", idsHolder)
-							_, err = Destroy<%= opts[:through].to_s.pluralize.camelize %>Where(sql, idsT...)
+							where = fmt.Sprintf("<%= model_name_underscore %>_id IN (?%s)", idsHolder)
+							_, err = Destroy<%= opts[:through].to_s.pluralize.camelize %>Where(where, idsT...)
 							if err != nil {
 								log.Printf("Destroy associated object %s error: %v\n", "<%= opts[:through].to_s.singularize.camelize %>", err)
 							}
+						<%- elsif opts[:as] -%>
+							where := fmt.Sprintf(`<%= opts[:as] %>_type = "<%= @model_name %>" AND <%= opts[:as] %>_id IN (?%s)`, idsHolder)
+							_, err = Destroy<%= opts[:class_name].pluralize %>Where(where, idsT...)
+							if err != nil {
+								log.Printf("Destroy associated object %s error: %v\n", "<%= opts[:class_name].pluralize %>", err)
+							}
 						<%- else -%>
 							<%- if opts.key? :foreign_key -%>
-								sql := fmt.Sprintf("<%= opts[:foreign_key] %> IN (?%s)", idsHolder)
+								where := fmt.Sprintf("<%= opts[:foreign_key] %> IN (?%s)", idsHolder)
 							<%- else -%>
-								sql := fmt.Sprintf("<%= model_name_underscore %>_id IN (?%s)", idsHolder)
+								where := fmt.Sprintf("<%= model_name_underscore %>_id IN (?%s)", idsHolder)
 							<%- end -%>
-							_, err = Destroy<%= opts[:class_name].pluralize %>Where(sql, idsT...)
+							_, err = Destroy<%= opts[:class_name].pluralize %>Where(where, idsT...)
 							if err != nil {
 								log.Printf("Destroy associated object %s error: %v\n", "<%= opts[:class_name].pluralize %>", err)
 							}
