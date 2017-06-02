@@ -91,6 +91,7 @@ And the gem is still under development, so there're a lot of known issues.
   - [x] numericality(partially)
   - [ ] other validations
 - [ ] Callbacks
+- [ ] Transactions
 
 ## Golang dependencies by default
 
