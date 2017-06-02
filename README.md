@@ -76,15 +76,21 @@ And the gem is still under development, so there're a lot of known issues.
 
 ## Known issues and TODOs
 
-* the generated Golang codes includes the association between models, basic relations like has_many, has_one, belongs_to have been supported
-* so some association functions is available
-* and the :dependent action is triggered when destroying some related model
-* some validation like presense, length restriction and format are supported
-* databases specific functions between mysql, postgres are not covered yet
-* model callbacks are not available
+* databases specific functions between MySQL, Postgres are not covered yet
 * sql.NullType not supported yet, so you'd better in the migrations set those columns "not null" with a default value that's consistent with Golang's zero value specification, such as "" default for string and text typed column, and 0 default for int, etc.
 
-Really a lot...
+- [x] Associations
+  - [x] has_many
+  - [x] has_one
+  - [x] belongs_to
+  - [x] dependent
+- [x] Validations
+  - [x] length
+  - [x] presence
+  - [x] format(string only)
+  - [x] numericality(partially)
+  - [ ] other validations
+- [ ] Callbacks
 
 ## Golang dependencies by default
 
