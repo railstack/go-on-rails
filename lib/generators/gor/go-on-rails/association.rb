@@ -15,7 +15,11 @@ module GoOnRails
           col_name = assoc.name.to_s.camelize
           class_name = assoc.name.to_s.singularize.camelize
           unless assoc.options.empty?
-            class_name = assoc.options[:class_name] if assoc.options.key? :class_name
+            if assoc.options.key? :class_name
+              class_name = assoc.options[:class_name]
+            elsif assoc.options.key? :source
+              class_name = assoc.options[:source].to_s.camelize
+            end
           end
           type_name = "[]#{class_name}"
           info[:assoc_info][:has_many][col_name] = {class_name: class_name}
@@ -23,7 +27,13 @@ module GoOnRails
 
         when :has_one, :belongs_to
           col_name = class_name = assoc.name.to_s.camelize
-          class_name = assoc.options[:class_name] if assoc.options.key? :class_name unless assoc.options.empty?
+          unless assoc.options.empty?
+            if assoc.options.key? :class_name
+              class_name = assoc.options[:class_name]
+            elsif assoc.options.key? :source
+              class_name = assoc.options[:source].to_s.camelize
+            end
+          end
           type_name = class_name
           info[:assoc_info][assoc.macro][col_name] = {class_name: class_name}
           info[:assoc_info][assoc.macro][col_name].merge!(assoc.options) unless assoc.options.empty?
