@@ -178,3 +178,16 @@ func TestPhysicianCountWhere(t *testing.T) {
 		t.Error("Test PhysicianCountWhere success failed")
 	}
 }
+
+// TestFindPhysicianBySql test the function PhysicianCountWhere
+func TestFindPhysicianBySql(t *testing.T) {
+	c, err := FindPhysicianBySql("SELECT id, name FROM physicians WHERE name = ? ORDER BY id DESC LIMIT 1", "TuoHua")
+	if err != nil {
+		t.Error("Test FindPhsicianBySql error")
+	}
+	if c.Name == "TuoHua" {
+		fmt.Println("Test FindPhsicianBySql success")
+	} else {
+		t.Error("Test FindPhsicianBySql failed")
+	}
+}

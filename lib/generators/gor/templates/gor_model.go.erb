@@ -345,10 +345,28 @@ func Find<%= @model_name.pluralize %>Where(where string, args ...interface{}) (<
 	return <%= param_name_plural %>, nil
 }
 
-// Find<%= @model_name.pluralize %>BySQL query use a complete SQL clause
-// with placeholders, eg: FindUsersBySQL("SELECT * FROM users WHERE first_name = ? AND age > ?", "John", 18)
+// Find<%= @model_name %>BySql query use a complete SQL clause
+// with placeholders, eg: FindUserBySql("SELECT * FROM users WHERE first_name = ? AND age > ? ORDER BY DESC LIMIT 1", "John", 18)
+// will return only One record in the table "users" whose first_name is "John" and age elder than 18
+func Find<%= @model_name %>BySql(sql string, args ...interface{}) (*<%= @model_name %>, error) {
+	stmt, err := db.Preparex(db.Rebind(sql))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	_<%= model_name_underscore %> := &<%= @model_name %>{}
+	err = stmt.Get(_<%= model_name_underscore %>, args...)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return _<%= model_name_underscore %>, nil
+}
+
+// Find<%= @model_name.pluralize %>BySql query use a complete SQL clause
+// with placeholders, eg: FindUsersBySql("SELECT * FROM users WHERE first_name = ? AND age > ?", "John", 18)
 // will return those records in the table "users" whose first_name is "John" and age elder than 18
-func Find<%= @model_name.pluralize %>BySQL(sql string, args ...interface{}) (<%= param_name_plural %> []<%= @model_name %>, err error) {
+func Find<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (<%= param_name_plural %> []<%= @model_name %>, err error) {
 	stmt, err := db.Preparex(db.Rebind(sql))
 	if err != nil {
 		log.Println(err)
@@ -472,7 +490,7 @@ func <%= @model_name %>Get<%= k.pluralize %>(id int64) ([]<%= v[:class_name] %>,
 		               INNER JOIN <%= through_table %>
 		                       ON <%= target_table %>.id = <%= through_table %>.<%= v[:class_name].underscore %>_id
 		        WHERE <%= through_table %>.<%= model_name_underscore %>_id = ?`
-		_<%= k.underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>BySQL(sql, id)
+		_<%= k.underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>BySql(sql, id)
 	<%- elsif v[:as] -%>
 		where := `<%= v[:as] %>_type = "<%= @model_name %>" AND <%= v[:as] %>_id = ?`
 		_<%= k.underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>Where(where, id)
@@ -655,7 +673,7 @@ func destroy<%= @model_name %>Associations(ids ...int64) {
 						// no sql.NULLType supported, just set the associated field to zero value of int64
 						<%- if opts[:through] -%>
 							sql := fmt.Sprintf("UPDATE <%= opts[:through].to_s %> SET <%= opts[:class_name].underscore %>_id = 0 WHERE <%= opts[:class_name].underscore %>_id IN (?%s)", idsHolder)
-							_, err = Update<%= opts[:through].to_s.camelize %>BySQL(sql, idsT...)
+							_, err = Update<%= opts[:through].to_s.camelize %>BySql(sql, idsT...)
 							if err != nil {
 								log.Printf("Delete associated object %s error: %v\n", "<%= opts[:class_name].pluralize %>", err)
 							}
@@ -665,7 +683,7 @@ func destroy<%= @model_name %>Associations(ids ...int64) {
 							<%- else -%>
 								sql := fmt.Sprintf("UPDATE <%= opts[:class_name].underscore.pluralize %> SET <%= model_name_underscore %>_id = 0 WHERE <%= model_name_underscore %>_id IN (?%s)", idsHolder)
 							<%- end -%>
-							_, err = Update<%= opts[:class_name].pluralize %>BySQL(sql, idsT...)
+							_, err = Update<%= opts[:class_name].pluralize %>BySql(sql, idsT...)
 							if err != nil {
 								log.Printf("Delete associated object %s error: %v\n", "<%= opts[:class_name].pluralize %>", err)
 							}
@@ -753,7 +771,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) UpdateColumns(am map[st
 	return err
 }
 
-func Update<%= @model_name.pluralize %>BySQL(sql string, args ...interface{}) (int64, error) {
+func Update<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (int64, error) {
 	if sql == "" {
 		return 0, errors.New("A blank SQL clause")
 	}
