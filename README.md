@@ -13,15 +13,15 @@ Here's a simple [example(tutorial)](https://github.com/goonr/example_simple) sho
 
 ## Prerequisites
 
-* Rails development environment
-* Golang development environment
+* Rails 4.2+
+* Golang 1.4+
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'go-on-rails', '~> 0.1.1'
+gem 'go-on-rails', '~> 0.1.2'
 ```
 
 And then execute:
