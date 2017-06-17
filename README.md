@@ -118,6 +118,10 @@ The `dev` branch has a whole Rails environment for development: models, seeds fo
 - Commit, do not mess with Rakefile or version (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
 - Send me a pull request. Bonus points for topic branches.
 
+### Testing
+
+Run `rails db:seed` to use the data defined in `db/seeds.rb`. And change to `go_app/models` directory to run `go test` to test generated models-related functions.
+
 ## License
 
 See the [LICENSE](https://github.com/goonr/go-on-rails/blob/master/MIT-LICENSE) file.
