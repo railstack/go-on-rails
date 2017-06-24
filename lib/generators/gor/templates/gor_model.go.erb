@@ -220,7 +220,7 @@ func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interf
 						for _, vv := range _<%= v[:class_name].underscore.pluralize %> {
 							for i, vvv := range  _<%= param_name_plural %> {
 								<%- if v[:foreign_key] -%>
-									if vv.<%= v[:foreign_key].camelize %> == vvv.Id {
+									if vv.<%= v[:foreign_key].to_s.camelize %> == vvv.Id {
 										vvv.<%= k %> = append(vvv.<%= k %>, vv)
 									}
 								<%- else -%>
@@ -251,7 +251,7 @@ func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interf
 					for _, vv := range _<%= v[:class_name].underscore.pluralize %> {
 						for i, vvv := range  _<%= param_name_plural %> {
 							<%- if v[:foreign_key] -%>
-								if vv.<%= v[:foreign_key].camelize %> == vvv.Id {
+								if vv.<%= v[:foreign_key].to_s.camelize %> == vvv.Id {
 									vvv.<%= k %> = vv
 								}
 							<%- else -%>
