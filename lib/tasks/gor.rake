@@ -12,6 +12,7 @@ namespace :gor do
     puts 'Installation completed!'
   end
 
+  desc 'Gofmt the generated codes on models'
   task :fmt do
     go_files = Rails.root.join('go_app', 'models/*.go').to_s
     system "gofmt -w #{go_files} > /dev/null 2>&1"
