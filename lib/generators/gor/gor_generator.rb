@@ -20,20 +20,21 @@ class GorGenerator < Rails::Generators::Base
                   env_name
                 end
 
-    models = options[:models]
-    if models.empty?
-      models = get_all_models "app/models"
+    @models = options[:models]
+    if @models.empty?
+      @models = get_all_models "app/models"
     else
-      models.map!(&:camelize)
+      @models.map!(&:camelize)
     end
-    puts "The models: #{models} and Rails env [#{rails_env}] will be used to generate Golang App!"
+    puts "Rails env: [#{rails_env}]"
+    puts "The models: #{@models} will be converted to a Golang App!"
 
-    models.each do |m|
+    @models.each do |m|
       begin
         klass = m.split('::').inject(Object) { |kls, part| kls.const_get(part) }
         if klass < ActiveRecord::Base && !klass.abstract_class?
           @model_name = klass.to_s
-          convertor = GoOnRails::Convertor.new(klass, models)
+          convertor = GoOnRails::Convertor.new(klass, @models)
           @struct_info = convertor.convert
           template "gor_model.go.erb", "go_app/models/gor_#{@model_name.underscore}.go"
         end
@@ -66,7 +67,7 @@ class GorGenerator < Rails::Generators::Base
   def get_all_models model_dir
     Dir.chdir(model_dir) do
       Dir["**/*.rb"]
-    end.map { |m| m.sub(/\.rb$/,'').camelize }
+    end.map { |m| m.sub(/\.rb$/,'').camelize } - ["ApplicationRecord"]
   end
 
   def create_database_config rails_env
