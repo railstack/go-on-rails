@@ -21,7 +21,7 @@ Here's a simple [example(tutorial)](https://github.com/goonr/example_simple) sho
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'go-on-rails', '~> 0.1.2'
+gem 'go-on-rails', '~> 0.1.3'
 ```
 
 And then execute:
