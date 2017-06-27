@@ -37,7 +37,7 @@ $ gem install go-on-rails
 
 You must have a Rails app or to create one before you can try go-on-rails generator to convert a Rails app to Golang codes.
 
-You can just run the command to convert the application:
+After that you can just run the command to convert the application:
 
 ```bash
 rails g gor [dev(elopment) | pro(duction) | test] [-m model_a model_b model_c ...]
