@@ -120,7 +120,14 @@ The `dev` branch has a whole Rails environment for development: models, seeds fo
 
 ### Testing
 
-Run `rails db:seed` to use the data defined in `db/seeds.rb`. And change to `go_app/models` directory to run `go test` to test generated models-related functions.
+We create four models for testing:
+
+- Physician
+- Patient
+- Appointment
+- Picture
+
+Run `rails db:seed` to use the data defined in `db/seeds.rb`. And change to `go_app/models` directory to run `go test` to test generated models-related functions. The test covers a small part of the functions currently. More will be added later on.
 
 ## License
 
