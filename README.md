@@ -76,7 +76,7 @@ rails g gor --help
 You can view the godoc page of all functions in http://localhost:7979/doc/models.html after run:
 
 ```bash
-rails gor:docs
+rails gor:doc
 ```
 
 And the gem is still under development, so there're a lot of known issues.

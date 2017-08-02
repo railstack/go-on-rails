@@ -19,7 +19,7 @@ namespace :gor do
   end
 
   desc 'View the doc of all the functions generated on models'
-  task :docs do
+  task :doc do
     models_dir = Rails.root.join('go_app', 'models').to_s
     puts 'Please open "http://localhost:7979/doc/models.html" to view the doc of all functions generated on models.'
     puts 'Use Ctrl-C to terminate this server!'
