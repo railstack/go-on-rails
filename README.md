@@ -72,6 +72,8 @@ rails g gor --help
 * And each struct related CRUD functions/methods like FindModel, UpdateModel, DestroyModle etc. All these models related program files under the `go_app/models` directory
 * We use [Gin](https://github.com/gin-gonic/gin) as the default web framework, but you can change it to anyone that you favor in `main.go` and `controllers` programs
 
+You can view the godoc page of all functions generated on models in http://localhost:7979/doc/models.html after run `rails gor:docs`.
+
 And the gem is still under development, so there're a lot of known issues.
 
 ## Known issues and TODOs
