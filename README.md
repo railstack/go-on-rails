@@ -73,6 +73,8 @@ rails g gor --help
 * And godoc files for all the functions under `go_app/models/doc`
 * We use [Gin](https://github.com/gin-gonic/gin) as the default web framework, but you can change it to anyone that you favor in `main.go` and `controllers` programs
 
+### View the godoc of all functions
+
 You can view the godoc page of all functions in http://localhost:7979/doc/models.html after run:
 
 ```bash
