@@ -105,7 +105,7 @@ class GorGenerator < Rails::Generators::Base
     return unless Dir.exist?(File.expand_path(models_dir))
     doc_dir = File.join(models_dir, "doc")
     Dir.mkdir(doc_dir) unless Dir.exist?(doc_dir)
-    system "godoc -html #{models_dir} > #{doc_dir}/models.html"
+    system "godoc -html #{models_dir} | awk '{ gsub(\"/src/target\", \"\"); print }' > #{doc_dir}/models.html"
   end
 end
 
