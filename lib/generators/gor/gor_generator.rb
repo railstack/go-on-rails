@@ -60,6 +60,9 @@ class GorGenerator < Rails::Generators::Base
 
     # use gofmt to prettify the generated Golang files
     gofmt_go_files
+
+    # generate go docs for models
+    generate_go_docs
   end
 
   private
@@ -95,6 +98,14 @@ class GorGenerator < Rails::Generators::Base
   def gofmt_go_files
     go_files = Rails.root.join('go_app', 'models/*.go').to_s
     system "gofmt -w #{go_files} > /dev/null 2>&1"
+  end
+
+  def generate_go_docs
+    models_dir = Rails.root.join('go_app', 'models').to_s
+    return unless Dir.exist?(File.expand_path(models_dir))
+    doc_dir = File.join(models_dir, "doc")
+    Dir.mkdir(doc_dir) unless Dir.exist?(doc_dir)
+    system "godoc -html #{models_dir} > #{doc_dir}/models.html"
   end
 end
 
