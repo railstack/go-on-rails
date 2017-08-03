@@ -17,6 +17,11 @@ import (
 	"github.com/asaskevich/govalidator"
 )
 
+// set flags to output more detailed log
+func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+}
+
 type <%= @model_name %> struct {
 	<%= @struct_info[:struct_body] -%>
 }
