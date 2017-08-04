@@ -3,7 +3,7 @@
 go-on-rails
 ====
 
-go-on-rails is a Rails generator assumed for three scenarios:
+go-on-rails is a Rails generator created for three scenarios:
 
 1. Integrate some APIs written in Golang to existed Rails app for high performance
 2. Use your farmiliar Rails tools to develope and manage a Golang app project
