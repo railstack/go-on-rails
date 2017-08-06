@@ -382,6 +382,8 @@ func Find<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (<%=
 	return <%= param_name_plural %>, nil
 }
 
+// Create<%= @model_name %> use a named params to create a single <%= @model_name %> record.
+// A named params is key-value map like map[string]interface{}{"first_name": "John", "age": 23} .
 func Create<%= @model_name %>(am map[string]interface{}) (int64, error) {
 	if len(am) == 0 {
 		return 0, fmt.Errorf("Zero key in the attributes map!")
@@ -415,6 +417,7 @@ func Create<%= @model_name %>(am map[string]interface{}) (int64, error) {
 	return lastId, nil
 }
 
+// Create is a method for <%= @model_name %> to create a record
 func (_<%= model_name_underscore %> *<%= @model_name %>) Create() (int64, error) {
 	ok, err := govalidator.ValidateStruct(_<%= model_name_underscore %>)
 	if !ok {
@@ -448,7 +451,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) Create() (int64, error)
 <%- unless @struct_info[:assoc_info][:has_many].empty? -%>
 	<%- has_many = @struct_info[:assoc_info][:has_many] -%>
 	<%- has_many.each do |k, v| -%>
-// <%= k.pluralize %>Create used to create the associated objects
+// <%= k.pluralize %>Create is used for <%= @model_name %> to create the associated objects <%= k.pluralize %>
 func (_<%= model_name_underscore %> *<%= @model_name %>) <%= k.pluralize %>Create(am map[string]interface{}) error {
 	<%- if v[:through] -%>
 		// FIXME: use transaction to create these associated objects
@@ -472,7 +475,9 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) <%= k.pluralize %>Creat
 	return err
 }
 
-// Get<%= k.pluralize %> used to get associated objects
+// Get<%= k.pluralize %> is used for <%= @model_name %> to get associated objects <%= k.pluralize %>
+// Say you have a <%= @model_name %> object named <%= model_name_underscore %>, when you call <%= model_name_underscore %>.Get<%= k.pluralize %>(),
+// the object will get the associated <%= k.pluralize %> attributes evaluated in the struct
 func (_<%= model_name_underscore %> *<%= @model_name %>) Get<%= k.pluralize %>() error {
 	_<%= k.underscore.pluralize %>, err := <%= @model_name %>Get<%= k.pluralize %>(_<%= model_name_underscore %>.Id)
 	if err == nil {
@@ -512,6 +517,7 @@ func <%= @model_name %>Get<%= k.pluralize %>(id int64) ([]<%= v[:class_name] %>,
 <%- unless @struct_info[:assoc_info][:has_one].empty? -%>
 	<%- has_one = @struct_info[:assoc_info][:has_one] -%>
 	<%- has_one.each do |k, v| -%>
+// Create<%= k %> is a method used for <%= @model_name %> model
 func (_<%= model_name_underscore %> *<%= @model_name %>) Create<%= k %>(am map[string]interface{}) error {
 	<%- if v[:foreign_key] -%>
 	am["<%= v[:foreign_key] %>"] = _<%= model_name_underscore %>.Id
@@ -529,6 +535,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) Create<%= k %>(am map[s
 	<%- belongs_to.each do |k, v| -%>
     <%-# don't create virtual table for polymorphic model -%>
 	<%- next if v[:polymorphic] -%>
+// Create<%= k %> is a method for a <%= @model_name %> object to create an associated <%= k %> record
 func (_<%= model_name_underscore %> *<%= @model_name %>) Create<%= k %>(am map[string]interface{}) error {
 	<%- if v[:foreign_key] -%>
 	am["<%= v[:foreign_key] %>"] = _<%= model_name_underscore %>.Id
@@ -541,6 +548,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) Create<%= k %>(am map[s
 	<%- end -%>
 <%- end -%>
 
+// Destroy is method used for a <%= @model_name %> object to be destroyed.
 func (_<%= model_name_underscore %> *<%= @model_name %>) Destroy() error {
 	if _<%= model_name_underscore %>.Id == 0 {
 		return errors.New("Invalid Id field: it can't be a zero value")
@@ -549,6 +557,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) Destroy() error {
 	return err
 }
 
+// Destroy<%= @model_name %> will destroy a <%= @model_name %> record specified by id parameter.
 func Destroy<%= @model_name %>(id int64) error {
 	<%- if @struct_info[:has_assoc_dependent] -%>
 	// Destroy association objects at first
@@ -563,6 +572,7 @@ func Destroy<%= @model_name %>(id int64) error {
 	return nil
 }
 
+// Destroy<%= @model_name.pluralize %> will destroy <%= @model_name %> records those specified by the ids parameters.
 func Destroy<%= @model_name.pluralize %>(ids ...int64) (int64, error) {
 	if len(ids) == 0 {
 		msg := "At least one or more ids needed"
@@ -623,7 +633,8 @@ func Destroy<%= @model_name.pluralize %>Where(where string, args ...interface{})
 }
 
 <%- if @struct_info[:has_assoc_dependent] -%>
-// the func not return err temporarily
+// destroy<%= @model_name %>Associations is a private function used to destroy a <%= @model_name %> record's associated objects.
+// The func not return err temporarily.
 func destroy<%= @model_name %>Associations(ids ...int64) {
 	idsHolder := ""
 	if len(ids) > 1 {
@@ -698,6 +709,7 @@ func destroy<%= @model_name %>Associations(ids ...int64) {
 }
 <%- end -%>
 
+// Save method is used for a <%= @model_name %> object to update a existed record
 func (_<%= model_name_underscore %> *<%= @model_name %>) Save() error {
 	ok, err := govalidator.ValidateStruct(_<%= model_name_underscore %>)
 	if !ok {
@@ -721,6 +733,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) Save() error {
     return err
 }
 
+// Update<%= @model_name %> is used to update a record with a id and map[string]interface{} typed key-value parameters.
 func Update<%= @model_name %>(id int64, am map[string]interface{}) error {
 	if len(am) == 0 {
 		return errors.New("Zero key in the attributes map!")
@@ -749,6 +762,7 @@ func Update<%= @model_name %>(id int64, am map[string]interface{}) error {
 	return nil
 }
 
+// Update is a method used to update a <%= @model_name %> record with the map[string]interface{} typed key-value parameters.
 func (_<%= model_name_underscore %> *<%= @model_name %>) Update(am map[string]interface{}) error {
 	if _<%= model_name_underscore %>.Id == 0 {
 		return errors.New("Invalid Id field: it can't be a zero value")
@@ -765,6 +779,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) UpdateAttributes(am map
 	return err
 }
 
+// UpdateColumns method is supposed to be used to update <%= @model_name %> records as corresponding update_columns in Rails
 func (_<%= model_name_underscore %> *<%= @model_name %>) UpdateColumns(am map[string]interface{}) error {
 	if _<%= model_name_underscore %>.Id == 0 {
 		return errors.New("Invalid Id field: it can't be a zero value")
@@ -773,6 +788,8 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) UpdateColumns(am map[st
 	return err
 }
 
+// Update<%= @model_name.pluralize %>BySql is used to update <%= @model_name %> records by a SQL clause
+// that use '?' binding syntax
 func Update<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (int64, error) {
 	if sql == "" {
 		return 0, errors.New("A blank SQL clause")
