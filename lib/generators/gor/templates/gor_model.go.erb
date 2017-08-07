@@ -722,7 +722,8 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) Save() error {
 		return errors.New(errMsg)
 	}
 	if _<%= model_name_underscore %>.Id == 0 {
-		return _<%= model_name_underscore %>.Create()
+		_, err = _<%= model_name_underscore %>.Create()
+		return err
 	}
 <%- if @struct_info[:timestamp_cols].include? "updated_at" -%>
 	_<%= model_name_underscore %>.UpdatedAt = time.Now()
