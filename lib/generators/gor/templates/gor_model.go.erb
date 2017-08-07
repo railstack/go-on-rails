@@ -709,7 +709,8 @@ func destroy<%= @model_name %>Associations(ids ...int64) {
 }
 <%- end -%>
 
-// Save method is used for a <%= @model_name %> object to update a existed record
+// Save method is used for a <%= @model_name %> object to update an existed record mainly.
+// If no id provided a new record will be created. A UPSERT action will be implemented further.
 func (_<%= model_name_underscore %> *<%= @model_name %>) Save() error {
 	ok, err := govalidator.ValidateStruct(_<%= model_name_underscore %>)
 	if !ok {
@@ -721,7 +722,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) Save() error {
 		return errors.New(errMsg)
 	}
 	if _<%= model_name_underscore %>.Id == 0 {
-		return errors.New("Invalid Id field: it can't be a zero value")
+		return _<%= model_name_underscore %>.Create()
 	}
 <%- if @struct_info[:timestamp_cols].include? "updated_at" -%>
 	_<%= model_name_underscore %>.UpdatedAt = time.Now()
