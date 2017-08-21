@@ -86,7 +86,7 @@ func Last<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 	return _<%= param_name_plural %>, nil
 }
 
-// Find<%= @model_name.pluralize %> find one or more <%= model_name_underscore.pluralize %> by one or more ids
+// Find<%= @model_name.pluralize %> find one or more <%= model_name_underscore.pluralize %> by the given ID(s)
 func Find<%= @model_name.pluralize %>(ids ...int64) ([]<%= @model_name %>, error) {
 	if len(ids) == 0 {
 		msg := "At least one or more ids needed"
@@ -272,7 +272,7 @@ func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interf
 	return _<%= param_name_plural %>, nil
 }
 
-// <%= @model_name %>Ids get all the Ids of <%= @model_name %> records
+// <%= @model_name %>Ids get all the IDs of <%= @model_name %> records
 func <%= @model_name %>Ids() (ids []int64, err error) {
 	err = db.Select(&ids, "SELECT id FROM <%= table_name %>")
 	if err != nil {
@@ -282,7 +282,7 @@ func <%= @model_name %>Ids() (ids []int64, err error) {
 	return ids, nil
 }
 
-// <%= @model_name %>IdsWhere get all the Ids of <%= @model_name %> records by where restriction
+// <%= @model_name %>IdsWhere get all the IDs of <%= @model_name %> records by where restriction
 func <%= @model_name %>IdsWhere(where string, args ...interface{}) ([]int64, error) {
 	ids, err := <%= @model_name %>IntCol("id", where, args...)
 	return ids, err
