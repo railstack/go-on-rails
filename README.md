@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/go-on-rails.svg)](https://badge.fury.io/rb/go-on-rails)
+
 <img align="right" width="260" height="260" src="./go-on-rails.png">
 
 go-on-rails
