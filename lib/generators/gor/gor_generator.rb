@@ -75,6 +75,7 @@ class GorGenerator < Rails::Generators::Base
 
   def create_database_config rails_env
     db_conf = Rails.configuration.database_configuration[rails_env]
+    db_conf["host"] = "localhost" unless db_conf["host"]
     case db_conf["adapter"]
     when "sqlite3"
       @db_config[:driver_name] = "sqlite3"
@@ -82,10 +83,11 @@ class GorGenerator < Rails::Generators::Base
       @db_config[:driver_package] = "_ \"github.com/mattn/go-sqlite3\""
     when "mysql2"
       @db_config[:driver_name] = "mysql"
+      db_conf["port"] = 3306 unless db_conf["port"]
       # MySQL DSN format: username:password@protocol(address)/dbname?param=value
       # See more: https://github.com/go-sql-driver/mysql
-      format = "%s:%s@%s/%s?charset=%s&parseTime=True&loc=Local"
-      @db_config[:dsn] = sprintf(format, *db_conf.values_at("username", "password", "host", "database", "encoding"))
+      format = "%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local"
+      @db_config[:dsn] = sprintf(format, *db_conf.values_at("username", "password", "host", "port", "database", "encoding"))
       @db_config[:driver_package] = "_ \"github.com/go-sql-driver/mysql\""
     when "postgresql"
       @db_config[:driver_name] = "postgres"
