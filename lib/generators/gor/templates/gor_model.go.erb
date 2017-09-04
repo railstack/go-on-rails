@@ -26,10 +26,10 @@ type <%= @model_name %> struct {
 	<%= @struct_info[:struct_body] -%>
 }
 
-// Find<%= @model_name %> find a single <%= model_name_underscore %> by an id
+// Find<%= @model_name %> find a single <%= model_name_underscore %> by an ID
 func Find<%= @model_name %>(id int64) (*<%= @model_name %>, error) {
 	if id == 0 {
-		return nil, errors.New("Invalid id: it can't be zero")
+		return nil, errors.New("Invalid ID: it can't be zero")
 	}
 	_<%= model_name_underscore %> := <%= @model_name %>{}
 	err := db.Get(&_<%= model_name_underscore %>, db.Rebind(`SELECT * FROM <%= table_name %> WHERE id = ? LIMIT 1`), id)
@@ -40,7 +40,7 @@ func Find<%= @model_name %>(id int64) (*<%= @model_name %>, error) {
 	return &_<%= model_name_underscore %>, nil
 }
 
-// First<%= @model_name %> find the first one <%= model_name_underscore %> by id ASC order
+// First<%= @model_name %> find the first one <%= model_name_underscore %> by ID ASC order
 func First<%= @model_name %>() (*<%= @model_name %>, error) {
 	_<%= model_name_underscore %> := <%= @model_name %>{}
 	err := db.Get(&_<%= model_name_underscore %>, db.Rebind(`SELECT * FROM <%= table_name %> ORDER BY id ASC LIMIT 1`))
@@ -51,7 +51,7 @@ func First<%= @model_name %>() (*<%= @model_name %>, error) {
 	return &_<%= model_name_underscore %>, nil
 }
 
-// First<%= @model_name.pluralize %> find the first N <%= model_name_underscore.pluralize %> by id ASC order
+// First<%= @model_name.pluralize %> find the first N <%= model_name_underscore.pluralize %> by ID ASC order
 func First<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 	_<%= param_name_plural %> := []<%= @model_name %>{}
 	sql := fmt.Sprintf("SELECT * FROM <%= table_name %> ORDER BY id ASC LIMIT %v", n)
@@ -63,7 +63,7 @@ func First<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 	return _<%= param_name_plural %>, nil
 }
 
-// Last<%= @model_name %> find the last one <%= model_name_underscore %> by id DESC order
+// Last<%= @model_name %> find the last one <%= model_name_underscore %> by ID DESC order
 func Last<%= @model_name %>() (*<%= @model_name %>, error) {
 	_<%= model_name_underscore %> := <%= @model_name %>{}
 	err := db.Get(&_<%= model_name_underscore %>, db.Rebind(`SELECT * FROM <%= table_name %> ORDER BY id DESC LIMIT 1`))
@@ -74,7 +74,7 @@ func Last<%= @model_name %>() (*<%= @model_name %>, error) {
 	return &_<%= model_name_underscore %>, nil
 }
 
-// Last<%= @model_name.pluralize %> find the last N <%= model_name_underscore.pluralize %> by id DESC order
+// Last<%= @model_name.pluralize %> find the last N <%= model_name_underscore.pluralize %> by ID DESC order
 func Last<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 	_<%= param_name_plural %> := []<%= @model_name %>{}
 	sql := fmt.Sprintf("SELECT * FROM <%= table_name %> ORDER BY id DESC LIMIT %v", n)
@@ -517,7 +517,7 @@ func <%= @model_name %>Get<%= k.pluralize %>(id int64) ([]<%= v[:class_name] %>,
 <%- unless @struct_info[:assoc_info][:has_one].empty? -%>
 	<%- has_one = @struct_info[:assoc_info][:has_one] -%>
 	<%- has_one.each do |k, v| -%>
-// Create<%= k %> is a method used for <%= @model_name %> model
+// Create<%= k %> is a method for the <%= @model_name %> model object to create an associated <%= k %> record
 func (_<%= model_name_underscore %> *<%= @model_name %>) Create<%= k %>(am map[string]interface{}) error {
 	<%- if v[:foreign_key] -%>
 	am["<%= v[:foreign_key] %>"] = _<%= model_name_underscore %>.Id
@@ -557,7 +557,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) Destroy() error {
 	return err
 }
 
-// Destroy<%= @model_name %> will destroy a <%= @model_name %> record specified by id parameter.
+// Destroy<%= @model_name %> will destroy a <%= @model_name %> record specified by the id parameter.
 func Destroy<%= @model_name %>(id int64) error {
 	<%- if @struct_info[:has_assoc_dependent] -%>
 	// Destroy association objects at first
@@ -602,8 +602,8 @@ func Destroy<%= @model_name.pluralize %>(ids ...int64) (int64, error) {
 	return cnt, nil
 }
 
-// Destroy<%= @model_name.pluralize %>Where delete records by a where clause
-// like: Destroy<%= @model_name.pluralize %>Where("name = ?", "John")
+// Destroy<%= @model_name.pluralize %>Where delete records by a where clause restriction.
+// e.g. Destroy<%= @model_name.pluralize %>Where("name = ?", "John")
 // And this func will not call the association dependent action
 func Destroy<%= @model_name.pluralize %>Where(where string, args ...interface{}) (int64, error) {
 	sql := `DELETE FROM <%= table_name %> WHERE `
@@ -773,6 +773,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) Update(am map[string]in
 	return err
 }
 
+// UpdateAttributes method is supposed to be used to update <%= @model_name %> records as corresponding update_attributes in Ruby on Rails.
 func (_<%= model_name_underscore %> *<%= @model_name %>) UpdateAttributes(am map[string]interface{}) error {
 	if _<%= model_name_underscore %>.Id == 0 {
 		return errors.New("Invalid Id field: it can't be a zero value")
@@ -781,7 +782,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) UpdateAttributes(am map
 	return err
 }
 
-// UpdateColumns method is supposed to be used to update <%= @model_name %> records as corresponding update_columns in Rails
+// UpdateColumns method is supposed to be used to update <%= @model_name %> records as corresponding update_columns in Ruby on Rails.
 func (_<%= model_name_underscore %> *<%= @model_name %>) UpdateColumns(am map[string]interface{}) error {
 	if _<%= model_name_underscore %>.Id == 0 {
 		return errors.New("Invalid Id field: it can't be a zero value")
@@ -791,7 +792,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) UpdateColumns(am map[st
 }
 
 // Update<%= @model_name.pluralize %>BySql is used to update <%= @model_name %> records by a SQL clause
-// that use '?' binding syntax
+// using the '?' binding syntax.
 func Update<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (int64, error) {
 	if sql == "" {
 		return 0, errors.New("A blank SQL clause")
