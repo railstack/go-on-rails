@@ -32,7 +32,7 @@ func Find<%= @model_name %>(id int64) (*<%= @model_name %>, error) {
 		return nil, errors.New("Invalid ID: it can't be zero")
 	}
 	_<%= model_name_underscore %> := <%= @model_name %>{}
-	err := db.Get(&_<%= model_name_underscore %>, db.Rebind(`SELECT * FROM <%= table_name %> WHERE id = ? LIMIT 1`), id)
+	err := DB.Get(&_<%= model_name_underscore %>, DB.Rebind(`SELECT * FROM <%= table_name %> WHERE id = ? LIMIT 1`), id)
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -43,7 +43,7 @@ func Find<%= @model_name %>(id int64) (*<%= @model_name %>, error) {
 // First<%= @model_name %> find the first one <%= model_name_underscore %> by ID ASC order
 func First<%= @model_name %>() (*<%= @model_name %>, error) {
 	_<%= model_name_underscore %> := <%= @model_name %>{}
-	err := db.Get(&_<%= model_name_underscore %>, db.Rebind(`SELECT * FROM <%= table_name %> ORDER BY id ASC LIMIT 1`))
+	err := DB.Get(&_<%= model_name_underscore %>, DB.Rebind(`SELECT * FROM <%= table_name %> ORDER BY id ASC LIMIT 1`))
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -55,7 +55,7 @@ func First<%= @model_name %>() (*<%= @model_name %>, error) {
 func First<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 	_<%= param_name_plural %> := []<%= @model_name %>{}
 	sql := fmt.Sprintf("SELECT * FROM <%= table_name %> ORDER BY id ASC LIMIT %v", n)
-	err := db.Select(&_<%= param_name_plural %>, db.Rebind(sql))
+	err := DB.Select(&_<%= param_name_plural %>, DB.Rebind(sql))
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -66,7 +66,7 @@ func First<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 // Last<%= @model_name %> find the last one <%= model_name_underscore %> by ID DESC order
 func Last<%= @model_name %>() (*<%= @model_name %>, error) {
 	_<%= model_name_underscore %> := <%= @model_name %>{}
-	err := db.Get(&_<%= model_name_underscore %>, db.Rebind(`SELECT * FROM <%= table_name %> ORDER BY id DESC LIMIT 1`))
+	err := DB.Get(&_<%= model_name_underscore %>, DB.Rebind(`SELECT * FROM <%= table_name %> ORDER BY id DESC LIMIT 1`))
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -78,7 +78,7 @@ func Last<%= @model_name %>() (*<%= @model_name %>, error) {
 func Last<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 	_<%= param_name_plural %> := []<%= @model_name %>{}
 	sql := fmt.Sprintf("SELECT * FROM <%= table_name %> ORDER BY id DESC LIMIT %v", n)
-	err := db.Select(&_<%= param_name_plural %>, db.Rebind(sql))
+	err := DB.Select(&_<%= param_name_plural %>, DB.Rebind(sql))
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -95,12 +95,12 @@ func Find<%= @model_name.pluralize %>(ids ...int64) ([]<%= @model_name %>, error
 	}
 	_<%= param_name_plural %> := []<%= @model_name %>{}
 	idsHolder := strings.Repeat(",?", len(ids)-1)
-	sql := db.Rebind(fmt.Sprintf(`SELECT * FROM <%= table_name %> WHERE id IN (?%s)`, idsHolder))
+	sql := DB.Rebind(fmt.Sprintf(`SELECT * FROM <%= table_name %> WHERE id IN (?%s)`, idsHolder))
 	idsT := []interface{}{}
 	for _,id := range ids {
 		idsT = append(idsT, interface{}(id))
 	}
-	err := db.Select(&_<%= param_name_plural %>, sql, idsT...)
+	err := DB.Select(&_<%= param_name_plural %>, sql, idsT...)
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -113,7 +113,7 @@ func Find<%= @model_name %>By(field string, val interface{}) (*<%= @model_name %
 	_<%= model_name_underscore %> := <%= @model_name %>{}
 	sqlFmt := `SELECT * FROM <%= table_name %> WHERE %s = ? LIMIT 1`
 	sqlStr := fmt.Sprintf(sqlFmt, field)
-	err := db.Get(&_<%= model_name_underscore %>, db.Rebind(sqlStr), val)
+	err := DB.Get(&_<%= model_name_underscore %>, DB.Rebind(sqlStr), val)
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -125,7 +125,7 @@ func Find<%= @model_name %>By(field string, val interface{}) (*<%= @model_name %
 func Find<%= @model_name.pluralize %>By(field string, val interface{}) (_<%= param_name_plural %> []<%= @model_name %>, err error) {
 	sqlFmt := `SELECT * FROM <%= table_name %> WHERE %s = ?`
 	sqlStr := fmt.Sprintf(sqlFmt, field)
-	err = db.Select(&_<%= param_name_plural %>, db.Rebind(sqlStr), val)
+	err = DB.Select(&_<%= param_name_plural %>, DB.Rebind(sqlStr), val)
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -135,7 +135,7 @@ func Find<%= @model_name.pluralize %>By(field string, val interface{}) (_<%= par
 
 // All<%= @model_name.pluralize %> get all the <%= @model_name %> records
 func All<%= @model_name.pluralize %>() (<%= param_name_plural %> []<%= @model_name %>, err error) {
-	err = db.Select(&<%= param_name_plural %>, "SELECT * FROM <%= table_name %>")
+	err = DB.Select(&<%= param_name_plural %>, "SELECT * FROM <%= table_name %>")
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -145,7 +145,7 @@ func All<%= @model_name.pluralize %>() (<%= param_name_plural %> []<%= @model_na
 
 // <%= @model_name %>Count get the count of all the <%= @model_name %> records
 func <%= @model_name %>Count() (c int64, err error) {
-	err = db.Get(&c, "SELECT count(*) FROM <%= table_name %>")
+	err = DB.Get(&c, "SELECT count(*) FROM <%= table_name %>")
 	if err != nil {
 		log.Println(err)
 		return 0, err
@@ -159,7 +159,7 @@ func <%= @model_name %>CountWhere(where string, args ...interface{}) (c int64, e
 	if len(where) > 0 {
 		sql = sql + " WHERE " + where
 	}
-	stmt, err := db.Preparex(db.Rebind(sql))
+	stmt, err := DB.Preparex(DB.Rebind(sql))
 	if err != nil {
 		log.Println(err)
 		return 0, err
@@ -274,7 +274,7 @@ func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interf
 
 // <%= @model_name %>Ids get all the IDs of <%= @model_name %> records
 func <%= @model_name %>Ids() (ids []int64, err error) {
-	err = db.Select(&ids, "SELECT id FROM <%= table_name %>")
+	err = DB.Select(&ids, "SELECT id FROM <%= table_name %>")
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -294,7 +294,7 @@ func <%= @model_name %>IntCol(col, where string, args ...interface{}) (intColRec
 	if len(where) > 0 {
 		sql = sql + " WHERE " + where
 	}
-	stmt, err := db.Preparex(db.Rebind(sql))
+	stmt, err := DB.Preparex(DB.Rebind(sql))
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -313,7 +313,7 @@ func <%= @model_name %>StrCol(col, where string, args ...interface{}) (strColRec
 	if len(where) > 0 {
 		sql = sql + " WHERE " + where
 	}
-	stmt, err := db.Preparex(db.Rebind(sql))
+	stmt, err := DB.Preparex(DB.Rebind(sql))
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -334,7 +334,7 @@ func Find<%= @model_name.pluralize %>Where(where string, args ...interface{}) (<
 	if len(where) > 0 {
 		sql = sql + " WHERE " + where
 	}
-	stmt, err := db.Preparex(db.Rebind(sql))
+	stmt, err := DB.Preparex(DB.Rebind(sql))
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -351,7 +351,7 @@ func Find<%= @model_name.pluralize %>Where(where string, args ...interface{}) (<
 // with placeholders, eg: FindUserBySql("SELECT * FROM users WHERE first_name = ? AND age > ? ORDER BY DESC LIMIT 1", "John", 18)
 // will return only One record in the table "users" whose first_name is "John" and age elder than 18
 func Find<%= @model_name %>BySql(sql string, args ...interface{}) (*<%= @model_name %>, error) {
-	stmt, err := db.Preparex(db.Rebind(sql))
+	stmt, err := DB.Preparex(DB.Rebind(sql))
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -369,7 +369,7 @@ func Find<%= @model_name %>BySql(sql string, args ...interface{}) (*<%= @model_n
 // with placeholders, eg: FindUsersBySql("SELECT * FROM users WHERE first_name = ? AND age > ?", "John", 18)
 // will return those records in the table "users" whose first_name is "John" and age elder than 18
 func Find<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (<%= param_name_plural %> []<%= @model_name %>, err error) {
-	stmt, err := db.Preparex(db.Rebind(sql))
+	stmt, err := DB.Preparex(DB.Rebind(sql))
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -404,7 +404,7 @@ func Create<%= @model_name %>(am map[string]interface{}) (int64, error) {
 	}
 	sqlFmt := `INSERT INTO <%= table_name %> (%s) VALUES (%s)`
 	sqlStr := fmt.Sprintf(sqlFmt, strings.Join(keys, ","), ":"+strings.Join(keys, ",:"))
-	result, err := db.NamedExec(sqlStr, am)
+	result, err := DB.NamedExec(sqlStr, am)
 	if err != nil {
 		log.Println(err)
 		return 0, err
@@ -435,7 +435,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) Create() (int64, error)
     <%- end -%>
 <%- end -%>
     sql := `INSERT INTO <%= table_name %> (<%= col_names.join(",") %>) VALUES (:<%= col_names.join(",:") %>)`
-    result, err := db.NamedExec(sql, _<%= model_name_underscore %>)
+    result, err := DB.NamedExec(sql, _<%= model_name_underscore %>)
 	if err != nil {
 		log.Println(err)
 		return 0, err
@@ -564,7 +564,7 @@ func Destroy<%= @model_name %>(id int64) error {
 	// Not care if exec properly temporarily
 	destroy<%= @model_name %>Associations(id)
     <%- end -%>
-	stmt, err := db.Preparex(db.Rebind(`DELETE FROM <%= table_name %> WHERE id = ?`))
+	stmt, err := DB.Preparex(DB.Rebind(`DELETE FROM <%= table_name %> WHERE id = ?`))
 	_, err = stmt.Exec(id)
 	if err != nil {
 		return err
@@ -590,7 +590,7 @@ func Destroy<%= @model_name.pluralize %>(ids ...int64) (int64, error) {
 	for _,id := range ids {
 		idsT = append(idsT, interface{}(id))
 	}
-	stmt, err := db.Preparex(db.Rebind(sql))
+	stmt, err := DB.Preparex(DB.Rebind(sql))
 	result, err := stmt.Exec(idsT...)
 	if err != nil {
 		return 0, err
@@ -620,7 +620,7 @@ func Destroy<%= @model_name.pluralize %>Where(where string, args ...interface{})
 		destroy<%= @model_name %>Associations(ids...)
 	}
 	<%- end -%>
-	stmt, err := db.Preparex(db.Rebind(sql))
+	stmt, err := DB.Preparex(DB.Rebind(sql))
 	result, err := stmt.Exec(args...)
 	if err != nil {
 		return 0, err
@@ -731,7 +731,7 @@ func (_<%= model_name_underscore %> *<%= @model_name %>) Save() error {
 	sqlFmt := `UPDATE <%= table_name %> SET %s WHERE id = %v`
 	<%- save_col_names = col_names - ["created_at"] -%>
 	sqlStr := fmt.Sprintf(sqlFmt, "<%= save_col_names.zip(save_col_names).map{|c| c.join(" = :")}.join(", ") %>", _<%= model_name_underscore %>.Id)
-    _, err = db.NamedExec(sqlStr, _<%= model_name_underscore %>)
+    _, err = DB.NamedExec(sqlStr, _<%= model_name_underscore %>)
     return err
 }
 
@@ -756,7 +756,7 @@ func Update<%= @model_name %>(id int64, am map[string]interface{}) error {
 		setKeysArr = append(setKeysArr, s)
 	}
 	sqlStr := fmt.Sprintf(sqlFmt, strings.Join(setKeysArr, ", "), id)
-	_, err := db.NamedExec(sqlStr, am)
+	_, err := DB.NamedExec(sqlStr, am)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -801,7 +801,7 @@ func Update<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (i
 	sql = strings.Replace(strings.ToLower(sql), "set", "set updated_at = ?, ", 1)
 	args = append([]interface{}{time.Now()}, args...)
 <%- end -%>
-	stmt, err := db.Preparex(db.Rebind(sql))
+	stmt, err := DB.Preparex(DB.Rebind(sql))
 	result, err := stmt.Exec(args...)
 	if err != nil {
 		return 0, err
