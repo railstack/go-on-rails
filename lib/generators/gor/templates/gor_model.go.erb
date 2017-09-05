@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"strings"
 	<%- if @struct_info[:has_datetime_type] -%>
 	"time"
@@ -25,6 +26,168 @@ func init() {
 type <%= @model_name %> struct {
 	<%= @struct_info[:struct_body] -%>
 }
+
+// DataStruct for the pagination
+type <%= @model_name %>Page struct {
+	WhereString string
+	WhereParams []interface{}
+	Order       map[string]string
+	FirstId     int64
+	LastId      int64
+	PageNum     int
+	PerPage     int
+	TotalPages  int
+	TotalItems  int64
+	orderStr    string
+}
+
+// Current get the current page of <%= @model_name %>Page object for pagination
+func (_p *<%= @model_name %>Page) Current() ([]<%= @model_name %>, error) {
+	if _, exist := _p.Order["id"]; !exist {
+		return nil, errors.New("No id order specified in Order map")
+	}
+	err := _p.buildPageCount()
+	if err != nil {
+		return nil, fmt.Errorf("Calculate page count error: %v", err)
+	}
+	if _p.orderStr == "" {
+		_p.buildOrder()
+	}
+	idStr, idParams := _p.buildIdRestrict("current")
+	whereStr := fmt.Sprintf("%s %s %s LIMIT %v", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
+	whereParams := []interface{}{}
+	whereParams = append(append(whereParams, _p.WhereParams...), idParams...)
+	<%= param_name_plural %>, err := Find<%= @model_name.pluralize %>Where(whereStr, whereParams...)
+	if err != nil {
+		return nil, err
+	}
+	if len(<%= param_name_plural %>) != 0 {
+		_p.FirstId, _p.LastId = <%= param_name_plural %>[0].Id, <%= param_name_plural %>[len(<%= param_name_plural %>)-1].Id
+	}
+	return <%= param_name_plural %>, nil
+}
+
+// Current get the previous page of <%= @model_name %>Page object for pagination
+func (_p *<%= @model_name %>Page) Previous() ([]<%= @model_name %>, error) {
+	if _p.PageNum == 0 {
+		return nil, errors.New("This's the first page, no previous page yet")
+	}
+	if _, exist := _p.Order["id"]; !exist {
+		return nil, errors.New("No id order specified in Order map")
+	}
+	err := _p.buildPageCount()
+	if err != nil {
+		return nil, fmt.Errorf("Calculate page count error: %v", err)
+	}
+	if _p.orderStr == "" {
+		_p.buildOrder()
+	}
+	idStr, idParams := _p.buildIdRestrict("previous")
+	whereStr := fmt.Sprintf("%s %s %s LIMIT %v", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
+	whereParams := []interface{}{}
+	whereParams = append(append(whereParams, _p.WhereParams...), idParams...)
+	<%= param_name_plural %>, err := Find<%= @model_name.pluralize %>Where(whereStr, whereParams...)
+	if err != nil {
+		return nil, err
+	}
+	if len(<%= param_name_plural %>) != 0 {
+		_p.FirstId, _p.LastId = <%= param_name_plural %>[0].Id, <%= param_name_plural %>[len(<%= param_name_plural %>)-1].Id
+	}
+	_p.PageNum -= 1
+	return <%= param_name_plural %>, nil
+}
+
+// Current get the next page of <%= @model_name %>Page object for pagination
+func (_p *<%= @model_name %>Page) Next() ([]<%= @model_name %>, error) {
+	if _p.PageNum == _p.TotalPages-1 {
+		return nil, errors.New("This's the last page, no next page yet")
+	}
+	if _, exist := _p.Order["id"]; !exist {
+		return nil, errors.New("No id order specified in Order map")
+	}
+	err := _p.buildPageCount()
+	if err != nil {
+		return nil, fmt.Errorf("Calculate page count error: %v", err)
+	}
+	if _p.orderStr == "" {
+		_p.buildOrder()
+	}
+	idStr, idParams := _p.buildIdRestrict("next")
+	whereStr := fmt.Sprintf("%s %s %s LIMIT %v", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
+	whereParams := []interface{}{}
+	whereParams = append(append(whereParams, _p.WhereParams...), idParams...)
+	<%= param_name_plural %>, err := Find<%= @model_name.pluralize %>Where(whereStr, whereParams...)
+	if err != nil {
+		return nil, err
+	}
+	if len(<%= param_name_plural %>) != 0 {
+		_p.FirstId, _p.LastId = <%= param_name_plural %>[0].Id, <%= param_name_plural %>[len(<%= param_name_plural %>)-1].Id
+	}
+	_p.PageNum += 1
+	return <%= param_name_plural %>, nil
+}
+
+// buildOrder is for <%= @model_name %>Page object to build SQL ORDER clause
+func (_p *<%= @model_name %>Page) buildOrder() {
+	tempList := []string{}
+	for k, v := range _p.Order {
+		tempList = append(tempList, fmt.Sprintf("%v %v", k, v))
+	}
+	_p.orderStr = " ORDER BY " + strings.Join(tempList, ", ")
+}
+
+// buildIdRestrict is for <%= @model_name %>Page object to build a SQL clause for ID restriction,
+// implementing a simple keyset style pagination
+func (_p *<%= @model_name %>Page) buildIdRestrict(direction string) (idStr string, idParams []interface{}) {
+	switch direction {
+	case "previous":
+		if strings.ToLower(_p.Order["id"]) == "desc" {
+			idStr += "id > ? "
+			idParams = append(_p.WhereParams, _p.FirstId)
+		} else {
+			idStr += "id < ? "
+			idParams = append(_p.WhereParams, _p.FirstId)
+		}
+	case "current":
+		// trick to make Where function work
+		if _p.PageNum == 0 && _p.FirstId == 0 && _p.LastId == 0 {
+			idStr += "id > ? "
+			idParams = append(_p.WhereParams, 0)
+		} else {
+			if strings.ToLower(_p.Order["id"]) == "desc" {
+				idStr += "id <= ? AND id >= ? "
+				idParams = append(_p.WhereParams, _p.FirstId, _p.LastId)
+			} else {
+				idStr += "id >= ? AND id <= ? "
+				idParams = append(_p.WhereParams, _p.FirstId, _p.LastId)
+			}
+		}
+	case "next":
+		if strings.ToLower(_p.Order["id"]) == "desc" {
+			idStr += "id < ? "
+			idParams = append(_p.WhereParams, _p.LastId)
+		} else {
+			idStr += "id > ? "
+			idParams = append(_p.WhereParams, _p.LastId)
+		}
+	}
+	return
+}
+
+// buildPageCount calculate the TotalItems/TotalPages for the <%= @model_name %>Page object
+func (_p *<%= @model_name %>Page) buildPageCount() error {
+	count, err := <%= @model_name %>CountWhere(_p.WhereString, _p.WhereParams...)
+	if err != nil {
+		return err
+	}
+	_p.TotalItems = count
+	if _p.PerPage == 0 {
+		_p.PerPage = 10
+	}
+	_p.TotalPages = int(math.Ceil(float64(_p.TotalItems) / float64(_p.PerPage)))
+	return nil
+}
+
 
 // Find<%= @model_name %> find a single <%= model_name_underscore %> by an ID
 func Find<%= @model_name %>(id int64) (*<%= @model_name %>, error) {
