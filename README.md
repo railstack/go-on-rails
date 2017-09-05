@@ -23,7 +23,7 @@ Here's a simple [example(tutorial)](https://github.com/goonr/example_simple) sho
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'go-on-rails', '~> 0.1.5'
+gem 'go-on-rails', '~> 0.1.6'
 ```
 
 And then execute:
@@ -101,6 +101,7 @@ And the gem is still under development, so there're a lot of known issues.
   - [x] format(string only)
   - [x] numericality(partially)
   - [ ] other validations
+- [x] Pagination(details see [wiki](https://github.com/goonr/go-on-rails/wiki/Pagination))
 - [ ] Callbacks
 - [ ] Transactions
 
