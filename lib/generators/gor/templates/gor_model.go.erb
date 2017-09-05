@@ -54,7 +54,11 @@ func (_p *<%= @model_name %>Page) Current() ([]<%= @model_name %>, error) {
 		_p.buildOrder()
 	}
 	idStr, idParams := _p.buildIdRestrict("current")
+<% if @db_config[:driver_name] == "postgres" %>
+	whereStr := fmt.Sprintf("%s %s %s FETCH NEXT %v ROWS ONLY", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
+<% else %>
 	whereStr := fmt.Sprintf("%s %s %s LIMIT %v", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
+<% end %>
 	whereParams := []interface{}{}
 	whereParams = append(append(whereParams, _p.WhereParams...), idParams...)
 	<%= param_name_plural %>, err := Find<%= @model_name.pluralize %>Where(whereStr, whereParams...)
@@ -83,7 +87,11 @@ func (_p *<%= @model_name %>Page) Previous() ([]<%= @model_name %>, error) {
 		_p.buildOrder()
 	}
 	idStr, idParams := _p.buildIdRestrict("previous")
+<% if @db_config[:driver_name] == "postgres" %>
+	whereStr := fmt.Sprintf("%s %s %s FETCH NEXT %v ROWS ONLY", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
+<% else %>
 	whereStr := fmt.Sprintf("%s %s %s LIMIT %v", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
+<% end %>
 	whereParams := []interface{}{}
 	whereParams = append(append(whereParams, _p.WhereParams...), idParams...)
 	<%= param_name_plural %>, err := Find<%= @model_name.pluralize %>Where(whereStr, whereParams...)
@@ -113,7 +121,11 @@ func (_p *<%= @model_name %>Page) Next() ([]<%= @model_name %>, error) {
 		_p.buildOrder()
 	}
 	idStr, idParams := _p.buildIdRestrict("next")
+<% if @db_config[:driver_name] == "postgres" %>
+	whereStr := fmt.Sprintf("%s %s %s FETCH NEXT %v ROWS ONLY", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
+<% else %>
 	whereStr := fmt.Sprintf("%s %s %s LIMIT %v", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
+<% end %>
 	whereParams := []interface{}{}
 	whereParams = append(append(whereParams, _p.WhereParams...), idParams...)
 	<%= param_name_plural %>, err := Find<%= @model_name.pluralize %>Where(whereStr, whereParams...)

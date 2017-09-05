@@ -29,6 +29,10 @@ class GorGenerator < Rails::Generators::Base
     puts "Rails env: [#{rails_env}]"
     puts "The models: #{@models} will be converted to a Golang App!"
 
+    # read the database configuration
+    @db_config = {}
+    create_database_config(rails_env)
+
     @models.each do |m|
       begin
         klass = m.split('::').inject(Object) { |kls, part| kls.const_get(part) }
@@ -48,8 +52,6 @@ class GorGenerator < Rails::Generators::Base
       copy_file "main.go", "go_app/main.go"
 
       # generate program for database connection
-      @db_config = {}
-      create_database_config(rails_env)
       template "db.go.erb", "go_app/models/db.go"
 
       # generate the controllers and views dir
