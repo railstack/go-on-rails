@@ -155,33 +155,36 @@ func (_p *<%= @model_name %>Page) buildIdRestrict(direction string) (idStr strin
 	case "previous":
 		if strings.ToLower(_p.Order["id"]) == "desc" {
 			idStr += "id > ? "
-			idParams = append(_p.WhereParams, _p.FirstId)
+			idParams = append(idParams, _p.FirstId)
 		} else {
 			idStr += "id < ? "
-			idParams = append(_p.WhereParams, _p.FirstId)
+			idParams = append(idParams, _p.FirstId)
 		}
 	case "current":
 		// trick to make Where function work
 		if _p.PageNum == 0 && _p.FirstId == 0 && _p.LastId == 0 {
 			idStr += "id > ? "
-			idParams = append(_p.WhereParams, 0)
+			idParams = append(idParams, 0)
 		} else {
 			if strings.ToLower(_p.Order["id"]) == "desc" {
 				idStr += "id <= ? AND id >= ? "
-				idParams = append(_p.WhereParams, _p.FirstId, _p.LastId)
+				idParams = append(idParams, _p.FirstId, _p.LastId)
 			} else {
 				idStr += "id >= ? AND id <= ? "
-				idParams = append(_p.WhereParams, _p.FirstId, _p.LastId)
+				idParams = append(idParams, _p.FirstId, _p.LastId)
 			}
 		}
 	case "next":
 		if strings.ToLower(_p.Order["id"]) == "desc" {
 			idStr += "id < ? "
-			idParams = append(_p.WhereParams, _p.LastId)
+			idParams = append(idParams, _p.LastId)
 		} else {
 			idStr += "id > ? "
-			idParams = append(_p.WhereParams, _p.LastId)
+			idParams = append(idParams, _p.LastId)
 		}
+	}
+	if _p.WhereString != "" {
+		idStr = " AND " + idStr
 	}
 	return
 }
