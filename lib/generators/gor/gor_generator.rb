@@ -33,6 +33,7 @@ class GorGenerator < Rails::Generators::Base
     @db_config = {}
     read_database_config(rails_env)
 
+    # iterate the models to generate Go codes
     @models.each do |m|
       begin
         klass = m.split('::').inject(Object) { |kls, part| kls.const_get(part) }
@@ -47,13 +48,12 @@ class GorGenerator < Rails::Generators::Base
       end
     end
 
+    # generate program for database connection
+    template "db.go.erb", "go_app/models/db.go"
+
     unless options[:only_models]
       # generate the main.go
       copy_file "main.go", "go_app/main.go"
-
-      # generate program for database connection
-      template "db.go.erb", "go_app/models/db.go"
-
       # generate the controllers and views dir
       template "home_controller.go.erb", "go_app/controllers/home_controller.go"
       copy_file "index.tmpl", "go_app/views/index.tmpl"
