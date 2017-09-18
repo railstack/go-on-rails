@@ -23,7 +23,7 @@ Here's a simple [example(tutorial)](https://github.com/goonr/example_simple) sho
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'go-on-rails', '~> 0.1.7'
+gem 'go-on-rails', '~> 0.1.8'
 ```
 
 And then execute:
