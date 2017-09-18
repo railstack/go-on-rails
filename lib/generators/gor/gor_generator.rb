@@ -5,12 +5,7 @@ class GorGenerator < Rails::Generators::Base
   class_option :only_models, type: :boolean, default: false, aliases: '-o', description: "only generate models"
 
   def generate_gor
-    env_names = %W(dev development pro production test)
-    unless env_names.include? env_name
-      printf("Invalid env argument: Not any of %p\n\n", env_names)
-      exit
-    end
-
+    env_names = ActiveRecord::Base.configurations.keys
     rails_env = case env_name
                 when "dev"
                   "development"
@@ -19,6 +14,11 @@ class GorGenerator < Rails::Generators::Base
                 else
                   env_name
                 end
+
+    unless env_names.include? rails_env
+      printf("Invalid env argument \"%s\": Not in the available list %p\n\n", rails_env, env_names)
+      exit
+    end
 
     @models = options[:models]
     if @models.empty?
