@@ -31,7 +31,7 @@ class GorGenerator < Rails::Generators::Base
 
     # read the database configuration
     @db_config = {}
-    create_database_config(rails_env)
+    read_database_config(rails_env)
 
     @models.each do |m|
       begin
@@ -75,7 +75,7 @@ class GorGenerator < Rails::Generators::Base
     end.map { |m| m.sub(/\.rb$/,'').camelize } - ["ApplicationRecord"]
   end
 
-  def create_database_config rails_env
+  def read_database_config rails_env
     db_conf = Rails.configuration.database_configuration[rails_env]
     db_conf["host"] = "localhost" unless db_conf["host"]
     case db_conf["adapter"]
