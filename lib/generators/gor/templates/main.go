@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	c "./controllers"
-	"gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {

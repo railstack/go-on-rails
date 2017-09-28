@@ -112,7 +112,7 @@ And the gem is still under development, so there're a lot of known issues.
 * `github.com/go-sql-driver/mysql`: a MySQL driver
 * `github.com/lib/pq`: a PostgreSQL driver
 * `github.com/asaskevich/govalidator`: for the struct validation
-* `gopkg.in/gin-gonic/gin.v1`: a HTTP web framework
+* `github.com/gin-gonic/gin`: a HTTP web framework
 
 ## Acknowledgement
 
