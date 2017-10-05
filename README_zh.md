@@ -5,7 +5,7 @@
 go-on-rails
 ====
 
-go-on-rails 的目标功能是：
+`go-on-rails` 的目标功能主要有：
 
 1. 对于 Rails 应用中的某些需要高性能的接口，使用 go-on-rails 来生成代码，并把生成的 Go 接口集成进 Rails 项目进行替换
 2. Rails 程序员可以使用熟悉的工具链开发和管理一个 Golang 的项目
