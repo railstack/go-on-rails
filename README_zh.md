@@ -34,7 +34,7 @@ $ bundle
 
 ## 用法
 
-在运行生成 Go 代码的命令之前，你得保证已经在 Rails 中至少已经创建了一个 Model，然后运行如下格式的命令来生成 Go 代码：
+在运行生成 Go 代码的命令之前，你得保证在 Rails 中至少已经创建了一个 Model，然后运行如下格式的命令来生成 Go 代码：
 
 ```bash
 rails g gor [dev(elopment) | pro(duction) | test] [-m model_a model_b model_c ...]
@@ -55,9 +55,9 @@ cd go_app
 go run main.go
 ```
 
-这时可以在浏览器中访问 http://localhost:3000，正常的话会看到类似一个新建 Rails 项目的默认首页。
+这时可以在浏览器中访问 http://localhost:3000，正常的话会看到一个类似新建的 Rails 项目的默认首页。
 
-关于这个生成器命令行的更多用法可以查看 go-on-rails 其帮助选项：
+关于这个生成器命令行的更多用法可以查看 go-on-rails 的帮助选项：
 
 ```bash
 rails g gor --help
@@ -65,8 +65,8 @@ rails g gor --help
 
 ## 该命令都会生成些什么？
 
-* Go 项目的布局（所有程序都在 `go_app` 文件夹下，如 `views`、 `controllers`、 `public` 等）
-* 针对每个 activerecord Model 生成相应的 Go 数据结构
+* 一个 Go 项目的目录布局（所有程序都在 `go_app` 文件夹下，在其下面包括如 `views`、 `controllers`、 `public` 等文件夹）
+* 针对每个 activerecord 的 Model 生成相应的 Go 数据结构
 * 同时针对每个数据结构生成相关的 CRUD 函数／方法，如 FindModel, UpdateModel, DestroyModle 等等。所有这些 Model 相关的代码都生成在 `go_app/models` 目录下。
 * 在文件夹 `go_app/models/doc` 下生成的所有函数的 godoc 文档
 * 我们默认使用 [Gin](https://github.com/gin-gonic/gin) 作为我们的 Web 框架，你也可以通过改动 `main.go` 以及 `controllers` 等文件来使用你喜欢的框架，同时配合使用生成的 Model 相关的函数
