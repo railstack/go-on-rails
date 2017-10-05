@@ -24,7 +24,7 @@ go-on-rails
 在 Rails 项目的 Gemfile 中添加下面一行:
 
 ```ruby
-gem 'go-on-rails', '~> 0.1.8'
+gem 'go-on-rails', '~> 0.1.9'
 ```
 
 然后运行:
