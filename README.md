@@ -5,7 +5,7 @@
 go-on-rails
 ====
 
-(中文文档)[./README_zh.md]
+[中文文档](./README_zh.md)
 
 go-on-rails is a Rails generator created for three scenarios:
 
