@@ -103,12 +103,12 @@ rails gor:doc
 
 ## 默认需要的 Go 依赖包
 
-* (github.com/jmoiron/sqlx)[https://github.com/jmoiron/sqlx]: an extension on the standard `database/sql` database API library
-* (github.com/mattn/go-sqlite3)[https://github.com/mattn/go-sqlite3]: a SQLite driver
-* (github.com/go-sql-driver/mysql)[https://github.com/go-sql-driver/mysql]: a MySQL driver
-* (github.com/lib/pq)[https://github.com/lib/pq]: a PostgreSQL driver
-* (github.com/asaskevich/govalidator)[https://github.com/asaskevich/govalidator]: for the struct validation
-* (github.com/gin-gonic/gin)[https://github.com/gin-gonic/gin]: a HTTP web framework
+* [github.com/jmoiron/sqlx](https://github.com/jmoiron/sqlx): 标准 `database/sql` API 库的一个扩展版本
+* [github.com/mattn/go-sqlite3](https://github.com/mattn/go-sqlite3): SQLite dirver
+* [github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql): 一个 MySQL driver
+* [github.com/lib/pq](https://github.com/lib/pq): 一个 PostgreSQL driver
+* [github.com/asaskevich/govalidator](https://github.com/asaskevich/govalidator): 一个用作数据验证的包
+* [github.com/gin-gonic/gin](https://github.com/gin-gonic/gin): 一个易用的高性能 Web 框架
 
 
 ## 许可证
