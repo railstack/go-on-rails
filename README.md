@@ -5,6 +5,8 @@
 go-on-rails
 ====
 
+(中文文档)[./README_zh.md]
+
 go-on-rails is a Rails generator created for three scenarios:
 
 1. Integrate some APIs written in Golang to existed Rails app for high performance
