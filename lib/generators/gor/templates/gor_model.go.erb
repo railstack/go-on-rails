@@ -141,6 +141,22 @@ func (_p *<%= @model_name %>Page) Next() ([]<%= @model_name %>, error) {
 	return <%= var_pmn %>, nil
 }
 
+// GetPage() is a helper function for the <%= @model_name %>Page object to return a corresponding page due to
+// the parameter passed in, one of "previous, current or next"
+func (_p *<%= @model_name %>Page) GetPage(direction string) (ps []<%= @model_name %>, err error) {
+	switch direction {
+	case "previous":
+		ps, _ = _p.Previous()
+	case "next":
+		ps, _ = _p.Next()
+	case "current":
+		ps, _ = _p.Current()
+	default:
+		return nil, errors.New("Error: wrong dircetion! None of previous, current or next!")
+	}
+	return
+}
+
 // buildOrder is for <%= @model_name %>Page object to build SQL ORDER clause
 func (_p *<%= @model_name %>Page) buildOrder() {
 	tempList := []string{}

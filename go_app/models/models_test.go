@@ -191,3 +191,19 @@ func TestFindPhysicianBySql(t *testing.T) {
 		t.Error("Test FindPhsicianBySql failed")
 	}
 }
+
+// TestGetPage test the funciton GetPage() for the pagination
+func TestGetPage(t *testing.T) {
+	pm := PhysicianPage{
+		WhereString: "name LIKE ?",
+		WhereParams: []interface{}{"%QueBian%"},
+		Order:       map[string]string{"id": "desc"},
+		PerPage:     2}
+	ps, err := pm.GetPage("current")
+	if err != nil {
+		t.Error("Test GetPage error")
+	}
+	if len(ps) == 1 && ps[0].Name == "QueBian" {
+		fmt.Println("Test GetPage success")
+	}
+}
