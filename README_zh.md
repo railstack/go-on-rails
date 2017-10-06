@@ -1,4 +1,5 @@
 [![Gem Version](https://badge.fury.io/rb/go-on-rails.svg)](https://badge.fury.io/rb/go-on-rails)
+[![Build Status](https://travis-ci.org/goonr/go-on-rails.svg?branch=dev)](https://travis-ci.org/goonr/go-on-rails)
 
 <img align="right" width="260" height="260" src="./go-on-rails.png">
 
