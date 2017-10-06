@@ -14,6 +14,8 @@ before_install:
 install:
     - rvm install 2.3.4 --default
     - bundle install --jobs=3 --retry=3
+    - rails db:migrate
+    - rails db:seed
     - rails generate gor test
     - rails gor:deps
 
