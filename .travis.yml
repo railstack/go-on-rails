@@ -1,3 +1,8 @@
+# This test focuses on the generated Go codes to make things simple:
+# 1> Ruby use v2.3.4, specified in the Gemfile due to it's available in travis-ci by default
+# 2> Rails version is 5.0.2, also specified in Gemfile, it'll be installed by bundler
+# 3> and we set RAILS_ENV=test in travis-ci's Environment Variables setting
+
 language: go
 
 go:
