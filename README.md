@@ -14,7 +14,10 @@ go-on-rails is a Rails generator created for three scenarios:
 2. Use your farmiliar Rails tools to develope and manage a Golang app project
 3. Convert a *not very complicated* Rails app to Golang equivalent
 
-Here's a simple [example(tutorial)](https://github.com/goonr/example_simple) shows the basic usage of go-on-rails generator, and [another example](https://github.com/goonr/example_with_admin) shows how to integrate Go APIs in a Rails project. Some real-world examples are coming soon.
+Here's some examples:
+* a simple [example(tutorial)](https://github.com/goonr/example_simple) on the basic usage of go-on-rails generator
+* [An advanced example](https://github.com/goonr/example_with_admin) shows how to integrate Go APIs in a Rails project
+* [Another example](https://github.com/goonr/example_read_rails_cookie) shows how to read a Rails session from a go-on-rails generated Go API
 
 ## Prerequisites
 
