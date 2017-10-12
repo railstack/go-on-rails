@@ -47,6 +47,7 @@ class GorGenerator < Rails::Generators::Base
       end
     end
 
+    # iterate the structs info to generate codes for each model
     @all_structs_info.each do |k, v|
       @model_name, @struct_info = k, v
       template "gor_model.go.erb", "go_app/models/gor_#{@model_name.underscore}.go"
