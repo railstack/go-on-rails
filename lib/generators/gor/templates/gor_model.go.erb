@@ -2,6 +2,7 @@
 <%- var_pmn = table_name = @model_name.underscore.pluralize -%>
 <%#- var_umn stands for underscored model name -#%>
 <%- var_umn = @model_name.underscore -%>
+<%- fields  = @struct_info[:select_fields] -%>
 <%- col_names = @struct_info[:col_names] -%>
 <%- has_assoc = !@struct_info[:assoc_info][:has_many].empty? || !@struct_info[:assoc_info][:has_one].empty? -%>
 // Package models includes the functions on the model <%= @model_name %>.
@@ -228,7 +229,7 @@ func Find<%= @model_name %>(id int64) (*<%= @model_name %>, error) {
 		return nil, errors.New("Invalid ID: it can't be zero")
 	}
 	_<%= var_umn %> := <%= @model_name %>{}
-	err := DB.Get(&_<%= var_umn %>, DB.Rebind(`SELECT * FROM <%= table_name %> WHERE id = ? LIMIT 1`), id)
+	err := DB.Get(&_<%= var_umn %>, DB.Rebind(`SELECT <%= fields %> FROM <%= table_name %> WHERE <%= table_name %>.id = ? LIMIT 1`), id)
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -239,7 +240,7 @@ func Find<%= @model_name %>(id int64) (*<%= @model_name %>, error) {
 // First<%= @model_name %> find the first one <%= var_umn %> by ID ASC order
 func First<%= @model_name %>() (*<%= @model_name %>, error) {
 	_<%= var_umn %> := <%= @model_name %>{}
-	err := DB.Get(&_<%= var_umn %>, DB.Rebind(`SELECT * FROM <%= table_name %> ORDER BY id ASC LIMIT 1`))
+	err := DB.Get(&_<%= var_umn %>, DB.Rebind(`SELECT <%= fields %> FROM <%= table_name %> ORDER BY <%= table_name %>.id ASC LIMIT 1`))
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -250,7 +251,7 @@ func First<%= @model_name %>() (*<%= @model_name %>, error) {
 // First<%= @model_name.pluralize %> find the first N <%= var_umn.pluralize %> by ID ASC order
 func First<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 	_<%= var_pmn %> := []<%= @model_name %>{}
-	sql := fmt.Sprintf("SELECT * FROM <%= table_name %> ORDER BY id ASC LIMIT %v", n)
+	sql := fmt.Sprintf("SELECT <%= fields %> FROM <%= table_name %> ORDER BY <%= table_name %>.id ASC LIMIT %v", n)
 	err := DB.Select(&_<%= var_pmn %>, DB.Rebind(sql))
 	if err != nil {
 		log.Printf("Error: %v\n", err)
@@ -262,7 +263,7 @@ func First<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 // Last<%= @model_name %> find the last one <%= var_umn %> by ID DESC order
 func Last<%= @model_name %>() (*<%= @model_name %>, error) {
 	_<%= var_umn %> := <%= @model_name %>{}
-	err := DB.Get(&_<%= var_umn %>, DB.Rebind(`SELECT * FROM <%= table_name %> ORDER BY id DESC LIMIT 1`))
+	err := DB.Get(&_<%= var_umn %>, DB.Rebind(`SELECT <%= fields %> FROM <%= table_name %> ORDER BY <%= table_name %>.id DESC LIMIT 1`))
 	if err != nil {
 		log.Printf("Error: %v\n", err)
 		return nil, err
@@ -273,7 +274,7 @@ func Last<%= @model_name %>() (*<%= @model_name %>, error) {
 // Last<%= @model_name.pluralize %> find the last N <%= var_umn.pluralize %> by ID DESC order
 func Last<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 	_<%= var_pmn %> := []<%= @model_name %>{}
-	sql := fmt.Sprintf("SELECT * FROM <%= table_name %> ORDER BY id DESC LIMIT %v", n)
+	sql := fmt.Sprintf("SELECT <%= fields %> FROM <%= table_name %> ORDER BY <%= table_name %>.id DESC LIMIT %v", n)
 	err := DB.Select(&_<%= var_pmn %>, DB.Rebind(sql))
 	if err != nil {
 		log.Printf("Error: %v\n", err)
@@ -291,7 +292,7 @@ func Find<%= @model_name.pluralize %>(ids ...int64) ([]<%= @model_name %>, error
 	}
 	_<%= var_pmn %> := []<%= @model_name %>{}
 	idsHolder := strings.Repeat(",?", len(ids)-1)
-	sql := DB.Rebind(fmt.Sprintf(`SELECT * FROM <%= table_name %> WHERE id IN (?%s)`, idsHolder))
+	sql := DB.Rebind(fmt.Sprintf(`SELECT <%= fields %> FROM <%= table_name %> WHERE <%= table_name %>.id IN (?%s)`, idsHolder))
 	idsT := []interface{}{}
 	for _,id := range ids {
 		idsT = append(idsT, interface{}(id))
@@ -307,7 +308,7 @@ func Find<%= @model_name.pluralize %>(ids ...int64) ([]<%= @model_name %>, error
 // Find<%= @model_name %>By find a single <%= var_umn %> by a field name and a value
 func Find<%= @model_name %>By(field string, val interface{}) (*<%= @model_name %>, error) {
 	_<%= var_umn %> := <%= @model_name %>{}
-	sqlFmt := `SELECT * FROM <%= table_name %> WHERE %s = ? LIMIT 1`
+	sqlFmt := `SELECT <%= fields %> FROM <%= table_name %> WHERE %s = ? LIMIT 1`
 	sqlStr := fmt.Sprintf(sqlFmt, field)
 	err := DB.Get(&_<%= var_umn %>, DB.Rebind(sqlStr), val)
 	if err != nil {
@@ -319,7 +320,7 @@ func Find<%= @model_name %>By(field string, val interface{}) (*<%= @model_name %
 
 // Find<%= @model_name.pluralize %>By find all <%= var_pmn %> by a field name and a value
 func Find<%= @model_name.pluralize %>By(field string, val interface{}) (_<%= var_pmn %> []<%= @model_name %>, err error) {
-	sqlFmt := `SELECT * FROM <%= table_name %> WHERE %s = ?`
+	sqlFmt := `SELECT <%= fields %> FROM <%= table_name %> WHERE %s = ?`
 	sqlStr := fmt.Sprintf(sqlFmt, field)
 	err = DB.Select(&_<%= var_pmn %>, DB.Rebind(sqlStr), val)
 	if err != nil {
@@ -331,7 +332,7 @@ func Find<%= @model_name.pluralize %>By(field string, val interface{}) (_<%= var
 
 // All<%= @model_name.pluralize %> get all the <%= @model_name %> records
 func All<%= @model_name.pluralize %>() (<%= var_pmn %> []<%= @model_name %>, err error) {
-	err = DB.Select(&<%= var_pmn %>, "SELECT * FROM <%= table_name %>")
+	err = DB.Select(&<%= var_pmn %>, "SELECT <%= fields %> FROM <%= table_name %>")
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -526,7 +527,7 @@ func <%= @model_name %>StrCol(col, where string, args ...interface{}) (strColRec
 // with placeholders, eg: FindUsersWhere("first_name = ? AND age > ?", "John", 18)
 // will return those records in the table "users" whose first_name is "John" and age elder than 18
 func Find<%= @model_name.pluralize %>Where(where string, args ...interface{}) (<%= var_pmn %> []<%= @model_name %>, err error) {
-	sql := "SELECT * FROM <%= table_name %>"
+	sql := "SELECT <%= fields %> FROM <%= table_name %>"
 	if len(where) > 0 {
 		sql = sql + " WHERE " + where
 	}
@@ -688,7 +689,7 @@ func <%= @model_name %>Get<%= k.pluralize %>(id int64) ([]<%= v[:class_name] %>,
 		// FIXME: use transaction to create these associated objects
 		<%- target_table = v[:class_name].underscore.pluralize -%>
 		<%- through_table = v[:through].to_s.pluralize -%>
-		sql := `SELECT <%= target_table %>.*
+		sql := `SELECT <%= @all_structs_info[v[:class_name]][:select_fields] %>
 		        FROM   <%= target_table %>
 		               INNER JOIN <%= through_table %>
 		                       ON <%= target_table %>.id = <%= through_table %>.<%= v[:class_name].underscore %>_id
