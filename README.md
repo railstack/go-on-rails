@@ -93,7 +93,7 @@ And the gem is still under development, so there're a lot of known issues.
 
 ## Known issues and TODOs
 
-* databases specific functions between MySQL, Postgres are not covered yet
+* databases specific functions between MySQL and Postgres or other databases are not covered yet
 * sql.NullType not supported yet, so you'd better in the migrations set those columns "not null" with a default value that's consistent with Golang's zero value specification, such as "" default for string and text typed column, and 0 default for int, etc. And now we have an alternative approch for manipulating the database nullable fields, see the wiki [Working with database nullable fields](https://github.com/goonr/go-on-rails/wiki/Working-with-database-nullable-fields)
 
 - [x] Associations
