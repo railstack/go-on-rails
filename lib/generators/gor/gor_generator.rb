@@ -33,19 +33,24 @@ class GorGenerator < Rails::Generators::Base
     @db_config = {}
     read_database_config(rails_env)
 
-    # iterate the models to generate Go codes
+    @all_structs_info = {}
+    # iterate the models to get all the structs' info
     @models.each do |m|
       begin
         klass = m.split('::').inject(Object) { |kls, part| kls.const_get(part) }
         if klass < ActiveRecord::Base && !klass.abstract_class?
-          @model_name = klass.to_s
-          convertor = GoOnRails::Convertor.new(klass, @models)
-          @struct_info = convertor.convert
-          template "gor_model.go.erb", "go_app/models/gor_#{@model_name.underscore}.go"
+          convertor = GoOnRails::Convertor.new(klass, @models, @db_config[:driver_name])
+          @all_structs_info[klass.to_s] = convertor.convert
         end
       rescue Exception => e
         puts "Failed to convert the model [#{m}]: #{e.message}"
       end
+    end
+
+    # iterate the structs info to generate codes for each model
+    @all_structs_info.each do |k, v|
+      @model_name, @struct_info = k, v
+      template "gor_model.go.erb", "go_app/models/gor_#{@model_name.underscore}.go"
     end
 
     # generate program for database connection
