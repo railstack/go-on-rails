@@ -16,8 +16,10 @@ module GoOnRails
     }.freeze
 
     # COALESCE datetime typed field for different databases
+    # FIXME: no idea for sqlite3 at present
     DATETIME_COALESCE_MAP = {
-      "mysql" => "COALESCE(%s, CONVERT_TZ('0001-01-01 00:00:00','+00:00','UTC')) AS %s",
+      "sqlite3"  => "%s",
+      "mysql"    => "COALESCE(%s, CONVERT_TZ('0001-01-01 00:00:00','+00:00','UTC')) AS %s",
       "postgres" => "COALESCE(%s, (TIMESTAMP WITH TIME ZONE '0001-01-01 00:00:00+00') AT TIME ZONE 'UTC') AS %s"
     }.freeze
 
@@ -132,7 +134,7 @@ module GoOnRails
       when "inet"
         "COALESCE(%s, '0.0.0.0') AS %s"
       else
-        # here just return the column name, may skip some nullable field and cause an error in a query
+        # FIXME: here just return the column name, may skip some nullable field and cause an error in a query
         "%s"
       end
     end
