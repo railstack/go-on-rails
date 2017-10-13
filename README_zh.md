@@ -86,7 +86,7 @@ rails gor:doc
 ## 已知问题
 
 * 没有针对不同的数据库，比如 MySQL, Postgres 分别生成其不同的版本
-* 没有支持 sql.NullType 的数据类型，所以如果某个表中的字段出现 Null 时程序可能会出错，所以目前临时的做法是：你最好在 migration 中定义好 "not null"，给一个和 Go 的数据类型的零值相一致的默认值。
+* 没有支持 sql.NullType 的数据类型，所以如果某个表中的字段出现 Null 时程序可能会出错，所以目前临时的做法是：你最好在 migration 中定义好 "not null"，给一个和 Go 的数据类型的零值相一致的默认值。同时，我们给出了一个使用零值的解决方案，详见 wiki: [Working with database nullable fields](https://github.com/goonr/go-on-rails/wiki/Working-with-database-nullable-fields) 。
 
 - [x] Associations
   - [x] has_many
