@@ -1,5 +1,6 @@
 [![Gem Version](https://badge.fury.io/rb/go-on-rails.svg)](https://badge.fury.io/rb/go-on-rails)
 [![Build Status](https://travis-ci.org/goonr/go-on-rails.svg?branch=dev)](https://travis-ci.org/goonr/go-on-rails)
+[![Join the chat at https://gitter.im/goonr/Lobby](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/goonr/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 <img align="right" width="260" height="260" src="./go-on-rails.png">
 
