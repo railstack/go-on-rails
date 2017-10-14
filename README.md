@@ -17,7 +17,7 @@ go-on-rails is a Rails generator created for three scenarios:
 Here's some examples:
 * a simple [example(tutorial)](https://github.com/goonr/example_simple) on the basic usage of go-on-rails generator
 * [An advanced example](https://github.com/goonr/example_with_admin) shows how to integrate Go APIs in a Rails project
-* [Another example](https://github.com/goonr/example_read_rails_session) shows how to read a Rails session from a go-on-rails generated Go API
+* [Another example](https://github.com/goonr/example_read_rails_session) shows how to handle a Rails session to get an user's info in a go-on-rails generated Go API
 
 ## Prerequisites
 
