@@ -30,7 +30,7 @@ Here's some examples:
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'go-on-rails', '~> 0.1.11'
+gem 'go-on-rails', '~> 0.1.12'
 ```
 
 And then execute:
