@@ -111,7 +111,7 @@ rails gor:doc
 ## 默认需要的 Go 依赖包
 
 * [github.com/jmoiron/sqlx](https://github.com/jmoiron/sqlx): 标准 `database/sql` API 库的一个扩展版本
-* [github.com/goonr/go-sqlite3](https://github.com/goonr/go-sqlite3): SQLite driver(这是 [mattn/go-sqlite3](https://github.com/mattn/go-sqlite3) 的一个 fork 版本，[为什么我们使用这个版本](https://github.com/mattn/go-sqlite3/pull/468))
+* [github.com/goonr/go-sqlite3](https://github.com/goonr/go-sqlite3): SQLite driver(这是 [mattn/go-sqlite3](https://github.com/mattn/go-sqlite3) 的一个 fork 版本，这里有说明[为什么我们使用这个 fork 的版本](https://github.com/mattn/go-sqlite3/pull/468))
 * [github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql): 一个 MySQL driver
 * [github.com/lib/pq](https://github.com/lib/pq): 一个 PostgreSQL driver
 * [github.com/asaskevich/govalidator](https://github.com/asaskevich/govalidator): 一个用作数据验证的包

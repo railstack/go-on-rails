@@ -120,7 +120,7 @@ And the gem is still under development, so there're a lot of known issues.
 ## Golang dependencies by default
 
 * [github.com/jmoiron/sqlx](https://github.com/jmoiron/sqlx): an extension on the standard `database/sql` database API library
-* [github.com/goonr/go-sqlite3](https://github.com/goonr/go-sqlite3): a SQLite driver(This's a forked version of [mattn/go-sqlite3](https://github.com/mattn/go-sqlite3), and [why we use this version](https://github.com/mattn/go-sqlite3/pull/468))
+* [github.com/goonr/go-sqlite3](https://github.com/goonr/go-sqlite3): a SQLite driver(This's a forked version of [mattn/go-sqlite3](https://github.com/mattn/go-sqlite3), and This is [why we use this forked version](https://github.com/mattn/go-sqlite3/pull/468))
 * [github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql): a MySQL driver
 * [github.com/lib/pq](https://github.com/lib/pq): a PostgreSQL driver
 * [github.com/asaskevich/govalidator](https://github.com/asaskevich/govalidator): for the struct validation
