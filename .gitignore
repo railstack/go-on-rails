@@ -27,3 +27,4 @@ build/
 
 # Ignore the db schema
 db/schema.rb
+db/test.sqlite3
