@@ -9,7 +9,7 @@ go-on-rails
 
 [中文文档](./README_zh.md)
 
-go-on-rails is a Rails generator created for three scenarios:
+go-on-rails is a Rails generator aims to:
 
 1. Integrate some APIs written in Golang to existed Rails app for high performance
 2. Use your farmiliar Rails tools to develope and manage a Golang app project
