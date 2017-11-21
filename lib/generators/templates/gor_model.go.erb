@@ -44,7 +44,7 @@ type <%= @model_name %>Page struct {
 	orderStr    string
 }
 
-// Current get the current page of <%= @model_name %>Page object for pagination
+// Current get the current page of <%= @model_name %>Page object for pagination.
 func (_p *<%= @model_name %>Page) Current() ([]<%= @model_name %>, error) {
 	if _, exist := _p.Order["id"]; !exist {
 		return nil, errors.New("No id order specified in Order map")
@@ -74,7 +74,7 @@ func (_p *<%= @model_name %>Page) Current() ([]<%= @model_name %>, error) {
 	return <%= var_pmn %>, nil
 }
 
-// Previous get the previous page of <%= @model_name %>Page object for pagination
+// Previous get the previous page of <%= @model_name %>Page object for pagination.
 func (_p *<%= @model_name %>Page) Previous() ([]<%= @model_name %>, error) {
 	if _p.PageNum == 0 {
 		return nil, errors.New("This's the first page, no previous page yet")
@@ -108,7 +108,7 @@ func (_p *<%= @model_name %>Page) Previous() ([]<%= @model_name %>, error) {
 	return <%= var_pmn %>, nil
 }
 
-// Next get the next page of <%= @model_name %>Page object for pagination
+// Next get the next page of <%= @model_name %>Page object for pagination.
 func (_p *<%= @model_name %>Page) Next() ([]<%= @model_name %>, error) {
 	if _p.PageNum == _p.TotalPages-1 {
 		return nil, errors.New("This's the last page, no next page yet")
@@ -143,7 +143,7 @@ func (_p *<%= @model_name %>Page) Next() ([]<%= @model_name %>, error) {
 }
 
 // GetPage is a helper function for the <%= @model_name %>Page object to return a corresponding page due to
-// the parameter passed in, one of "previous, current or next"
+// the parameter passed in, i.e. one of "previous, current or next".
 func (_p *<%= @model_name %>Page) GetPage(direction string) (ps []<%= @model_name %>, err error) {
 	switch direction {
 	case "previous":
@@ -158,7 +158,7 @@ func (_p *<%= @model_name %>Page) GetPage(direction string) (ps []<%= @model_nam
 	return
 }
 
-// buildOrder is for <%= @model_name %>Page object to build SQL ORDER clause
+// buildOrder is for <%= @model_name %>Page object to build a SQL ORDER BY clause.
 func (_p *<%= @model_name %>Page) buildOrder() {
 	tempList := []string{}
 	for k, v := range _p.Order {
@@ -168,7 +168,7 @@ func (_p *<%= @model_name %>Page) buildOrder() {
 }
 
 // buildIdRestrict is for <%= @model_name %>Page object to build a SQL clause for ID restriction,
-// implementing a simple keyset style pagination
+// implementing a simple keyset style pagination.
 func (_p *<%= @model_name %>Page) buildIdRestrict(direction string) (idStr string, idParams []interface{}) {
 	switch direction {
 	case "previous":
@@ -208,7 +208,7 @@ func (_p *<%= @model_name %>Page) buildIdRestrict(direction string) (idStr strin
 	return
 }
 
-// buildPageCount calculate the TotalItems/TotalPages for the <%= @model_name %>Page object
+// buildPageCount calculate the TotalItems/TotalPages for the <%= @model_name %>Page object.
 func (_p *<%= @model_name %>Page) buildPageCount() error {
 	count, err := <%= @model_name %>CountWhere(_p.WhereString, _p.WhereParams...)
 	if err != nil {
@@ -223,7 +223,7 @@ func (_p *<%= @model_name %>Page) buildPageCount() error {
 }
 
 
-// Find<%= @model_name %> find a single <%= var_umn %> by an ID
+// Find<%= @model_name %> find a single <%= var_umn %> by an ID.
 func Find<%= @model_name %>(id int64) (*<%= @model_name %>, error) {
 	if id == 0 {
 		return nil, errors.New("Invalid ID: it can't be zero")
@@ -237,7 +237,7 @@ func Find<%= @model_name %>(id int64) (*<%= @model_name %>, error) {
 	return &_<%= var_umn %>, nil
 }
 
-// First<%= @model_name %> find the first one <%= var_umn %> by ID ASC order
+// First<%= @model_name %> find the first one <%= var_umn %> by ID ASC order.
 func First<%= @model_name %>() (*<%= @model_name %>, error) {
 	_<%= var_umn %> := <%= @model_name %>{}
 	err := DB.Get(&_<%= var_umn %>, DB.Rebind(`SELECT <%= fields %> FROM <%= table_name %> ORDER BY <%= table_name %>.id ASC LIMIT 1`))
@@ -248,7 +248,7 @@ func First<%= @model_name %>() (*<%= @model_name %>, error) {
 	return &_<%= var_umn %>, nil
 }
 
-// First<%= @model_name.pluralize %> find the first N <%= var_umn.pluralize %> by ID ASC order
+// First<%= @model_name.pluralize %> find the first N <%= var_umn.pluralize %> by ID ASC order.
 func First<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 	_<%= var_pmn %> := []<%= @model_name %>{}
 	sql := fmt.Sprintf("SELECT <%= fields %> FROM <%= table_name %> ORDER BY <%= table_name %>.id ASC LIMIT %v", n)
@@ -260,7 +260,7 @@ func First<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 	return _<%= var_pmn %>, nil
 }
 
-// Last<%= @model_name %> find the last one <%= var_umn %> by ID DESC order
+// Last<%= @model_name %> find the last one <%= var_umn %> by ID DESC order.
 func Last<%= @model_name %>() (*<%= @model_name %>, error) {
 	_<%= var_umn %> := <%= @model_name %>{}
 	err := DB.Get(&_<%= var_umn %>, DB.Rebind(`SELECT <%= fields %> FROM <%= table_name %> ORDER BY <%= table_name %>.id DESC LIMIT 1`))
@@ -271,7 +271,7 @@ func Last<%= @model_name %>() (*<%= @model_name %>, error) {
 	return &_<%= var_umn %>, nil
 }
 
-// Last<%= @model_name.pluralize %> find the last N <%= var_umn.pluralize %> by ID DESC order
+// Last<%= @model_name.pluralize %> find the last N <%= var_umn.pluralize %> by ID DESC order.
 func Last<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 	_<%= var_pmn %> := []<%= @model_name %>{}
 	sql := fmt.Sprintf("SELECT <%= fields %> FROM <%= table_name %> ORDER BY <%= table_name %>.id DESC LIMIT %v", n)
@@ -283,7 +283,7 @@ func Last<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
 	return _<%= var_pmn %>, nil
 }
 
-// Find<%= @model_name.pluralize %> find one or more <%= var_umn.pluralize %> by the given ID(s)
+// Find<%= @model_name.pluralize %> find one or more <%= var_umn.pluralize %> by the given ID(s).
 func Find<%= @model_name.pluralize %>(ids ...int64) ([]<%= @model_name %>, error) {
 	if len(ids) == 0 {
 		msg := "At least one or more ids needed"
@@ -305,7 +305,7 @@ func Find<%= @model_name.pluralize %>(ids ...int64) ([]<%= @model_name %>, error
 	return _<%= var_pmn %>, nil
 }
 
-// Find<%= @model_name %>By find a single <%= var_umn %> by a field name and a value
+// Find<%= @model_name %>By find a single <%= var_umn %> by a field name and a value.
 func Find<%= @model_name %>By(field string, val interface{}) (*<%= @model_name %>, error) {
 	_<%= var_umn %> := <%= @model_name %>{}
 	sqlFmt := `SELECT <%= fields %> FROM <%= table_name %> WHERE %s = ? LIMIT 1`
@@ -318,7 +318,7 @@ func Find<%= @model_name %>By(field string, val interface{}) (*<%= @model_name %
 	return &_<%= var_umn %>, nil
 }
 
-// Find<%= @model_name.pluralize %>By find all <%= var_pmn %> by a field name and a value
+// Find<%= @model_name.pluralize %>By find all <%= var_pmn %> by a field name and a value.
 func Find<%= @model_name.pluralize %>By(field string, val interface{}) (_<%= var_pmn %> []<%= @model_name %>, err error) {
 	sqlFmt := `SELECT <%= fields %> FROM <%= table_name %> WHERE %s = ?`
 	sqlStr := fmt.Sprintf(sqlFmt, field)
@@ -330,7 +330,7 @@ func Find<%= @model_name.pluralize %>By(field string, val interface{}) (_<%= var
 	return _<%= var_pmn %>, nil
 }
 
-// All<%= @model_name.pluralize %> get all the <%= @model_name %> records
+// All<%= @model_name.pluralize %> get all the <%= @model_name %> records.
 func All<%= @model_name.pluralize %>() (<%= var_pmn %> []<%= @model_name %>, err error) {
 	err = DB.Select(&<%= var_pmn %>, "SELECT <%= fields %> FROM <%= table_name %>")
 	if err != nil {
@@ -340,7 +340,7 @@ func All<%= @model_name.pluralize %>() (<%= var_pmn %> []<%= @model_name %>, err
 	return <%= var_pmn %>, nil
 }
 
-// <%= @model_name %>Count get the count of all the <%= @model_name %> records
+// <%= @model_name %>Count get the count of all the <%= @model_name %> records.
 func <%= @model_name %>Count() (c int64, err error) {
 	err = DB.Get(&c, "SELECT count(*) FROM <%= table_name %>")
 	if err != nil {
@@ -350,7 +350,7 @@ func <%= @model_name %>Count() (c int64, err error) {
 	return c, nil
 }
 
-// <%= @model_name %>CountWhere get the count of all the <%= @model_name %> records with a where clause
+// <%= @model_name %>CountWhere get the count of all the <%= @model_name %> records with a where clause.
 func <%= @model_name %>CountWhere(where string, args ...interface{}) (c int64, err error) {
 	sql := "SELECT count(*) FROM <%= table_name %>"
 	if len(where) > 0 {
@@ -369,7 +369,7 @@ func <%= @model_name %>CountWhere(where string, args ...interface{}) (c int64, e
 	return c, nil
 }
 
-// <%= @model_name %>IncludesWhere get the <%= @model_name %> associated models records, it's just the eager_load function
+// <%= @model_name %>IncludesWhere get the <%= @model_name %> associated models records, currently it's not same as the corresponding "includes" function but "preload" instead in Ruby on Rails. It means that the "sql" should be restricted on <%= @model_name %> model.
 func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interface{}) (_<%= var_pmn %> []<%= @model_name %>, err error) {
 	_<%= var_pmn %>, err = Find<%= @model_name.pluralize %>Where(sql, args...)
 	if err != nil {
@@ -469,7 +469,7 @@ func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interf
 	return _<%= var_pmn %>, nil
 }
 
-// <%= @model_name %>Ids get all the IDs of <%= @model_name %> records
+// <%= @model_name %>Ids get all the IDs of <%= @model_name %> records.
 func <%= @model_name %>Ids() (ids []int64, err error) {
 	err = DB.Select(&ids, "SELECT id FROM <%= table_name %>")
 	if err != nil {
@@ -479,13 +479,13 @@ func <%= @model_name %>Ids() (ids []int64, err error) {
 	return ids, nil
 }
 
-// <%= @model_name %>IdsWhere get all the IDs of <%= @model_name %> records by where restriction
+// <%= @model_name %>IdsWhere get all the IDs of <%= @model_name %> records by where restriction.
 func <%= @model_name %>IdsWhere(where string, args ...interface{}) ([]int64, error) {
 	ids, err := <%= @model_name %>IntCol("id", where, args...)
 	return ids, err
 }
 
-// <%= @model_name %>IntCol get some int64 typed column of <%= @model_name %> by where restriction
+// <%= @model_name %>IntCol get some int64 typed column of <%= @model_name %> by where restriction.
 func <%= @model_name %>IntCol(col, where string, args ...interface{}) (intColRecs []int64, err error) {
 	sql := "SELECT " + col + " FROM <%= table_name %>"
 	if len(where) > 0 {
@@ -504,7 +504,7 @@ func <%= @model_name %>IntCol(col, where string, args ...interface{}) (intColRec
 	return intColRecs, nil
 }
 
-// <%= @model_name %>StrCol get some string typed column of <%= @model_name %> by where restriction
+// <%= @model_name %>StrCol get some string typed column of <%= @model_name %> by where restriction.
 func <%= @model_name %>StrCol(col, where string, args ...interface{}) (strColRecs []string, err error) {
 	sql := "SELECT " + col + " FROM <%= table_name %>"
 	if len(where) > 0 {
@@ -525,7 +525,7 @@ func <%= @model_name %>StrCol(col, where string, args ...interface{}) (strColRec
 
 // Find<%= @model_name.pluralize %>Where query use a partial SQL clause that usually following after WHERE
 // with placeholders, eg: FindUsersWhere("first_name = ? AND age > ?", "John", 18)
-// will return those records in the table "users" whose first_name is "John" and age elder than 18
+// will return those records in the table "users" whose first_name is "John" and age elder than 18.
 func Find<%= @model_name.pluralize %>Where(where string, args ...interface{}) (<%= var_pmn %> []<%= @model_name %>, err error) {
 	sql := "SELECT <%= fields %> FROM <%= table_name %>"
 	if len(where) > 0 {
@@ -546,7 +546,7 @@ func Find<%= @model_name.pluralize %>Where(where string, args ...interface{}) (<
 
 // Find<%= @model_name %>BySql query use a complete SQL clause
 // with placeholders, eg: FindUserBySql("SELECT * FROM users WHERE first_name = ? AND age > ? ORDER BY DESC LIMIT 1", "John", 18)
-// will return only One record in the table "users" whose first_name is "John" and age elder than 18
+// will return only One record in the table "users" whose first_name is "John" and age elder than 18.
 func Find<%= @model_name %>BySql(sql string, args ...interface{}) (*<%= @model_name %>, error) {
 	stmt, err := DB.Preparex(DB.Rebind(sql))
 	if err != nil {
@@ -564,7 +564,7 @@ func Find<%= @model_name %>BySql(sql string, args ...interface{}) (*<%= @model_n
 
 // Find<%= @model_name.pluralize %>BySql query use a complete SQL clause
 // with placeholders, eg: FindUsersBySql("SELECT * FROM users WHERE first_name = ? AND age > ?", "John", 18)
-// will return those records in the table "users" whose first_name is "John" and age elder than 18
+// will return those records in the table "users" whose first_name is "John" and age elder than 18.
 func Find<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (<%= var_pmn %> []<%= @model_name %>, err error) {
 	stmt, err := DB.Preparex(DB.Rebind(sql))
 	if err != nil {
@@ -614,7 +614,7 @@ func Create<%= @model_name %>(am map[string]interface{}) (int64, error) {
 	return lastId, nil
 }
 
-// Create is a method for <%= @model_name %> to create a record
+// Create is a method for <%= @model_name %> to create a record.
 func (_<%= var_umn %> *<%= @model_name %>) Create() (int64, error) {
 	ok, err := govalidator.ValidateStruct(_<%= var_umn %>)
 	if !ok {
@@ -674,7 +674,7 @@ func (_<%= var_umn %> *<%= @model_name %>) <%= k.pluralize %>Create(am map[strin
 
 // Get<%= k.pluralize %> is used for <%= @model_name %> to get associated objects <%= k.pluralize %>
 // Say you have a <%= @model_name %> object named <%= var_umn %>, when you call <%= var_umn %>.Get<%= k.pluralize %>(),
-// the object will get the associated <%= k.pluralize %> attributes evaluated in the struct
+// the object will get the associated <%= k.pluralize %> attributes evaluated in the struct.
 func (_<%= var_umn %> *<%= @model_name %>) Get<%= k.pluralize %>() error {
 	_<%= k.underscore.pluralize %>, err := <%= @model_name %>Get<%= k.pluralize %>(_<%= var_umn %>.Id)
 	if err == nil {
@@ -683,7 +683,7 @@ func (_<%= var_umn %> *<%= @model_name %>) Get<%= k.pluralize %>() error {
     return err
 }
 
-// <%= @model_name %>Get<%= k.pluralize %> a helper fuction used to get associated objects for <%= @model_name %>IncludesWhere()
+// <%= @model_name %>Get<%= k.pluralize %> a helper fuction used to get associated objects for <%= @model_name %>IncludesWhere().
 func <%= @model_name %>Get<%= k.pluralize %>(id int64) ([]<%= v[:class_name] %>, error) {
 	<%- if v[:through] -%>
 		// FIXME: use transaction to create these associated objects
@@ -714,7 +714,7 @@ func <%= @model_name %>Get<%= k.pluralize %>(id int64) ([]<%= v[:class_name] %>,
 <%- unless @struct_info[:assoc_info][:has_one].empty? -%>
 	<%- has_one = @struct_info[:assoc_info][:has_one] -%>
 	<%- has_one.each do |k, v| -%>
-// Create<%= k %> is a method for the <%= @model_name %> model object to create an associated <%= k %> record
+// Create<%= k %> is a method for the <%= @model_name %> model object to create an associated <%= k %> record.
 func (_<%= var_umn %> *<%= @model_name %>) Create<%= k %>(am map[string]interface{}) error {
 	<%- if v[:foreign_key] -%>
 	am["<%= v[:foreign_key] %>"] = _<%= var_umn %>.Id
@@ -732,7 +732,7 @@ func (_<%= var_umn %> *<%= @model_name %>) Create<%= k %>(am map[string]interfac
 	<%- belongs_to.each do |k, v| -%>
     <%-# don't create virtual table for polymorphic model -%>
 	<%- next if v[:polymorphic] -%>
-// Create<%= k %> is a method for a <%= @model_name %> object to create an associated <%= k %> record
+// Create<%= k %> is a method for a <%= @model_name %> object to create an associated <%= k %> record.
 func (_<%= var_umn %> *<%= @model_name %>) Create<%= k %>(am map[string]interface{}) error {
 	<%- if v[:foreign_key] -%>
 	am["<%= v[:foreign_key] %>"] = _<%= var_umn %>.Id
@@ -907,7 +907,7 @@ func destroy<%= @model_name %>Associations(ids ...int64) {
 <%- end -%>
 
 // Save method is used for a <%= @model_name %> object to update an existed record mainly.
-// If no id provided a new record will be created. A UPSERT action will be implemented further.
+// If no id provided a new record will be created. FIXME: A UPSERT action will be implemented further.
 func (_<%= var_umn %> *<%= @model_name %>) Save() error {
 	ok, err := govalidator.ValidateStruct(_<%= var_umn %>)
 	if !ok {

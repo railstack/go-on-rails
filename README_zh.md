@@ -83,6 +83,8 @@ rails gor:doc
 
 浏览器地址为：http://localhost:7979/doc/models.html 。
 
+另外，这里有一个生成好的[示例项目](https://github.com/goonr/gor_models_sample)，在 godoc.org 可以浏览该示例项目的 godoc 文档，[详情](https://github.com/goonr/gor_models_sample)。
+
 ## 已知问题
 
 * 没有针对不同的数据库，比如 MySQL, Postgres 分别生成其不同的版本
