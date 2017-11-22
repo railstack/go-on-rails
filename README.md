@@ -44,17 +44,17 @@ $ gem install go-on-rails
 ```
 ## Usage
 
-You must have a Rails app or to create one before you can try go-on-rails generator to convert a Rails app to Golang codes.
+You must have an existed Rails app or to create a new one before you try go-on-rails to generate Golang codes.
 
-After that you can just run the command to convert the application:
+After that you can run the command just as other Rails generators:
 
 ```bash
 rails g gor [dev(elopment) | pro(duction) | test] [-m model_a model_b model_c ...]
 ```
 
-Then a directory named "go_app" with Golang codes will be generated under your Rails app root path.
+Then a folder named `go_app` that includes Golang codes will be generated under your Rails app root path.
 
-Install the dependent Golang packages:
+Install the dependent Golang packages for this Go project:
 
 ```bash
 rails gor:deps
