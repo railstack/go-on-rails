@@ -109,6 +109,8 @@ rails gor:doc
 
 * [内置的分页 Helper](https://github.com/goonr/go-on-rails/wiki/Pagination)
 * [如何处理数据库的 NULL 值](https://github.com/goonr/go-on-rails/wiki/Working-with-database-nullable-fields)
+* [几条 Make 命令](https://github.com/goonr/go-on-rails/wiki/Some-Make-commands)
+* [如何使用 Docker 发布 Go on Rails 应用](https://github.com/goonr/go-on-rails/wiki/Dockerize-a-Go-on-Rails-application)
 
 ## 默认需要的 Go 依赖包
 

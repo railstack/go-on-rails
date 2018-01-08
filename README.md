@@ -122,6 +122,8 @@ The gem is still under development, so there're some known issues.
 
 * [Built-in Pagination](https://github.com/goonr/go-on-rails/wiki/Pagination)
 * [Working with database nullable fields](https://github.com/goonr/go-on-rails/wiki/Working-with-database-nullable-fields)
+* [Some Make commands](https://github.com/goonr/go-on-rails/wiki/Some-Make-commands)
+* [Dockerize a Go-on-Rails application](https://github.com/goonr/go-on-rails/wiki/Dockerize-a-Go-on-Rails-application)
 
 ## Golang dependencies by default
 
