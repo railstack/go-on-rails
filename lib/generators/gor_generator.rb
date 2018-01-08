@@ -63,6 +63,10 @@ class GorGenerator < Rails::Generators::Base
       template "home_controller.go.erb", "go_app/controllers/home_controller.go"
       copy_file "index.tmpl", "go_app/views/index.tmpl"
       copy_file "favicon.ico", "go_app/public/favicon.ico"
+      # generate config files for make and dockerization
+      template "docker-compose.yml.erb", "docker-compose.yml"
+      template "Dockerfile.go_app.erb", "go_app/Dockerfile"
+      copy_file "Makefile", "go_app/Makefile"
     end
 
     # use gofmt to prettify the generated Golang files
@@ -81,25 +85,26 @@ class GorGenerator < Rails::Generators::Base
   end
 
   def read_database_config rails_env
-    db_conf = Rails.configuration.database_configuration[rails_env]
-    db_conf["host"] = "localhost" unless db_conf["host"]
-    case db_conf["adapter"]
+    @db_config = Rails.configuration.database_configuration[rails_env].symbolize_keys
+    @db_config[:host] ||= "localhost"
+    case @db_config[:adapter]
     when "sqlite3"
       @db_config[:driver_name] = "sqlite3"
-      @db_config[:dsn] = Rails.root.join(db_conf["database"]).to_s
+      @db_config[:dsn] = Rails.root.join(@db_config[:database]).to_s
       @db_config[:driver_package] = "_ \"github.com/goonr/go-sqlite3\""
     when "mysql2"
       @db_config[:driver_name] = "mysql"
-      db_conf["port"] = 3306 unless db_conf["port"]
+      @db_config[:port] ||= "3306"
       # MySQL DSN format: username:password@protocol(address)/dbname?param=value
       # See more: https://github.com/go-sql-driver/mysql
       format = "%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local"
-      @db_config[:dsn] = sprintf(format, *db_conf.values_at("username", "password", "host", "port", "database", "encoding"))
+      @db_config[:dsn] = sprintf(format, *@db_config.values_at(:username, :password, :host, :port, :database, :encoding))
       @db_config[:driver_package] = "_ \"github.com/go-sql-driver/mysql\""
     when "postgresql"
       @db_config[:driver_name] = "postgres"
-      format = "host=%s user=%s dbname=%s sslmode=disable password=%s"
-      @db_config[:dsn] = sprintf(format, *db_conf.values_at("host", "username", "database", "password"))
+      @db_config[:port] ||= "5432"
+      format = "host=%s port=%s user=%s dbname=%s sslmode=disable password=%s"
+      @db_config[:dsn] = sprintf(format, *@db_config.values_at(:host, :port, :username, :database, :password))
       @db_config[:driver_package] = "_ \"github.com/lib/pq\""
     end
   end

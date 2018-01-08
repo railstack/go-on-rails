@@ -69,7 +69,7 @@ Then change to the `go_app` directory and run:
 go run main.go
 ```
 
-You can visit the page in http://localhost:3000 by default.
+You can visit the page in http://localhost:4000 by default.
 
 More command details about go-on-rails generator:
 
