@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  <%- if %w[127.0.0.1 localhost].include? @db_config[:host] -%>
+  <%- if %w[127.0.0.1 localhost].include? @db_config[:host] and @db_config[:driver_name] != "sqlite3" -%>
   # generated according to the config/database.yml
   database:
     image: <%= @db_config[:driver_name] %>
@@ -16,7 +16,7 @@ services:
     command: bundle exec rails s -p 3000 -b '0.0.0.0'
     ports:
       - "3000:3000"
-  <%- if %w[127.0.0.1 localhost].include? @db_config[:host] -%>
+  <%- if %w[127.0.0.1 localhost].include? @db_config[:host] and @db_config[:driver_name] != "sqlite3" -%>
     depends_on:
       - database
   <%- end -%>
@@ -31,7 +31,7 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-  <%- if %w[127.0.0.1 localhost].include? @db_config[:host] -%>
+  <%- if %w[127.0.0.1 localhost].include? @db_config[:host] and @db_config[:driver_name] != "sqlite3" -%>
       - database
   <%- end -%>
       - rails_app
