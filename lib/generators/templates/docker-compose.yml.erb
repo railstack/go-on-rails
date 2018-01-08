@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  <%- if %w[127.0.0.1 localhost].include? @db_config[:host] and @db_config[:driver_name] != "sqlite3" -%>
+  # generated according to the config/database.yml
+  database:
+    image: <%= @db_config[:driver_name] %>
+    ports:
+      - '<%= @db_config[:port] %>:<%= @db_config[:port] %>'
+  <%- end -%>
+
+  # rails app part. You need to modify this part by your project
+  # and create a Dockerfile for it before you run any docker-compose command
+  rails_app:
+    build: .
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    ports:
+      - "3000:3000"
+  <%- if %w[127.0.0.1 localhost].include? @db_config[:host] and @db_config[:driver_name] != "sqlite3" -%>
+    depends_on:
+      - database
+  <%- end -%>
+
+  # golang app part. It depends on the rails_app to initialize the database
+  go_app:
+    build: ./go_app
+    command: ./myapp -port 4000
+    environment:
+      # Gin webserver run mode. Or "debug" for debugging
+      - GIN_MODE=release
+    ports:
+      - "4000:4000"
+    depends_on:
+  <%- if %w[127.0.0.1 localhost].include? @db_config[:host] and @db_config[:driver_name] != "sqlite3" -%>
+      - database
+  <%- end -%>
+      - rails_app

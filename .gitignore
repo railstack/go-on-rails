@@ -11,6 +11,7 @@
 ## Except the testing ones
 /go_app/
 !/go_app/models/models_test.go
+docker-compose.yml
 
 ## Specific to RubyMotion:
 .dat*

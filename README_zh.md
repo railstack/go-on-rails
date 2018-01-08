@@ -57,7 +57,7 @@ cd go_app
 go run main.go
 ```
 
-这时可以在浏览器中访问 http://localhost:3000 ，正常的话会看到一个类似新建的 Rails 项目的默认首页。
+这时可以在浏览器中访问 http://localhost:4000 ，正常的话会看到一个类似新建的 Rails 项目的默认首页。
 
 关于这个生成器命令行的更多用法可以查看 go-on-rails 的帮助选项：
 
