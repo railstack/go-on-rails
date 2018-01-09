@@ -3,8 +3,7 @@
 
 <img align="right" width="260" height="260" src="./go-on-rails.png">
 
-go-on-rails
-====
+# Go on Rails
 
 `go-on-rails` 是一个 Rails 的 generator，其目标功能主要有：
 
