@@ -13,7 +13,7 @@ build: $(MYAPP)
 	@:
 
 deps:
-	$(GO) get github.com/jmoiron/sqlx \
+	$(GO) get -u github.com/jmoiron/sqlx \
 		github.com/gin-gonic/gin \
 		github.com/goonr/go-sqlite3 \
 		github.com/go-sql-driver/mysql \

@@ -2,7 +2,7 @@ namespace :gor do
   desc 'Install dependent Golang packages'
   task :deps do
     puts 'Beginning to install Go deps...'
-    system "go get \
+    system "go get -u \
     github.com/jmoiron/sqlx \
     github.com/gin-gonic/gin \
     github.com/goonr/go-sqlite3 \
