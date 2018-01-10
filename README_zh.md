@@ -13,7 +13,7 @@
 下面是几个示例教程：
 * [简单示例](https://github.com/goonr/example_simple) 仿照 Rails guides 里那个入门的 [demo](http://guides.rubyonrails.org/getting_started.html)，演示如何使用 go-on-rails 创建和生成一个简单 blog 的 Go API。
 * [高级教程](https://github.com/goonr/example_with_admin)  如何创建一个 Go 项目，并和 rails_admin, devise, cancancan 等集成，为 Go 项目快速增加一个管理后台。同时该项目演示了如何使用 Rails 5.1 新发布的 webpacker 工具，并利用 React 制作独立的前端界面在 Rails 中调用 Go 接口。
-* [如何从 Go API 读取 Rails session](https://github.com/goonr/example_read_rails_session) 讲述如何在一个 go-on-rails 生成的 Go 接口中读取 Rails 的 session 做用户验证，以便于将需要用户验证的 Go API 集成进 Rails 项目
+* [如何从 Go API 读取 Rails session](https://github.com/goonr/example_read_rails_session) 讲述如何在一个 go-on-rails 生成的 Go 接口中读取 Rails 的 session 做用户验证，以便于将需要用户验证的 Go API 集成进 Rails 项目。
 
 ## 安装环境要求
 
