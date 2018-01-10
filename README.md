@@ -4,12 +4,11 @@
 
 <img align="right" width="260" height="260" src="./go-on-rails.png">
 
-go-on-rails
-====
+# Go on Rails
 
 [中文文档](./README_zh.md)
 
-go-on-rails is a Rails generator aims to:
+`go-on-rails` is a Rails generator aims to:
 
 1. Help to develop and integrate some APIs written in Golang to existed Rails app for high performance
 2. Use your farmiliar Rails tools to develop and manage a Golang app project
@@ -122,6 +121,8 @@ The gem is still under development, so there're some known issues.
 
 * [Built-in Pagination](https://github.com/goonr/go-on-rails/wiki/Pagination)
 * [Working with database nullable fields](https://github.com/goonr/go-on-rails/wiki/Working-with-database-nullable-fields)
+* [Some Make commands](https://github.com/goonr/go-on-rails/wiki/Some-Make-commands)
+* [Dockerize a Go-on-Rails application](https://github.com/goonr/go-on-rails/wiki/Dockerize-a-Go-on-Rails-application)
 
 ## Golang dependencies by default
 
