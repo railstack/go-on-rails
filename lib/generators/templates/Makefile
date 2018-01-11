@@ -21,7 +21,7 @@ deps:
 		github.com/asaskevich/govalidator
 
 test:
-	$(GO) test -v ./models
+	$(GO) test -v ./...
 
 run: $(MYAPP)
 	./$(MYAPP)
