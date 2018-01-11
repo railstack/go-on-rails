@@ -18,14 +18,14 @@
 ## 安装环境要求
 
 * Rails 4.2 及以上
-* Go 1.5 及以上
+* Go 1.7 及以上
 
 ## 安装
 
 在 Rails 项目的 Gemfile 中添加下面一行:
 
 ```ruby
-gem 'go-on-rails', '~> 0.2.0'
+gem 'go-on-rails', '~> 0.3.0'
 ```
 
 然后运行:

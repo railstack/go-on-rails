@@ -22,14 +22,14 @@ Here's some examples:
 ## Prerequisites
 
 * Rails 4.2+
-* Golang 1.5.x
+* Golang 1.7.x
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'go-on-rails', '~> 0.2.0'
+gem 'go-on-rails', '~> 0.3.0'
 ```
 
 And then execute:
