@@ -1,7 +1,10 @@
+<p align="center">
+  <img width="260" height="260" src="./go-on-rails.png">
+</p>
+
 [![Gem Version](https://badge.fury.io/rb/go-on-rails.svg)](https://badge.fury.io/rb/go-on-rails)
 [![Build Status](https://travis-ci.org/goonr/go-on-rails.svg?branch=dev)](https://travis-ci.org/goonr/go-on-rails)
-
-<img align="right" width="260" height="260" src="./go-on-rails.png">
+[![Maintainability](https://api.codeclimate.com/v1/badges/6fba1f226f027a14c19b/maintainability)](https://codeclimate.com/github/goonr/go-on-rails/maintainability)
 
 # Go on Rails
 
