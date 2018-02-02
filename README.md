@@ -9,7 +9,7 @@
 
 # Go on Rails
 
-[中文文档](./README_zh.md)
+[用 Rails 开发 Go 应用：中文文档](./README_zh.md)
 
 `go-on-rails` is a Rails generator aims to:
 
