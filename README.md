@@ -51,10 +51,16 @@ You must have an existed Rails app or to create a new one before you try go-on-r
 After that you can run the command just as other Rails generators:
 
 ```bash
-bundle exec rails g gor [dev(elopment) | pro(duction) | test] [-m model_a model_b model_c ...]
+bundle exec rails g gor [dev(elopment) | pro(duction) | test | ...] [-m model_a model_b model_c ...]
 
 # OR (on rails version < 5.0)
 bundle exec rake g gor ...
+```
+
+here we take generating all models for the `development` environment for example:
+
+```bash
+rails g gor dev
 ```
 
 Then a folder named `go_app` that includes Golang codes will be generated under your Rails app root path.

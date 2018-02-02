@@ -41,7 +41,13 @@ $ bundle
 在运行生成 Go 代码的命令之前，你得保证在 Rails 中至少已经创建了一个 Model，然后运行如下格式的命令来生成 Go 代码：
 
 ```bash
-rails g gor [dev(elopment) | pro(duction) | test] [-m model_a model_b model_c ...]
+rails g gor [dev(elopment) | pro(duction) | test | ...] [-m model_a model_b model_c ...]
+```
+
+这里比如我们为 `development` 环境所有的 model 进行操作：
+
+```bash
+rails g gor dev
 ```
 
 运行后会在 Rails 项目的根目录生成一个 `go_app` 的文件夹。
