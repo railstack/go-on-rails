@@ -91,7 +91,7 @@ class GorGenerator < Rails::Generators::Base
     when "sqlite3"
       @db_config[:driver_name] = "sqlite3"
       @db_config[:dsn] = Rails.root.join(@db_config[:database]).to_s
-      @db_config[:driver_package] = "_ \"github.com/goonr/go-sqlite3\""
+      @db_config[:driver_package] = "_ \"github.com/railstack/go-sqlite3\""
     when "mysql2"
       @db_config[:driver_name] = "mysql"
       @db_config[:port] ||= "3306"

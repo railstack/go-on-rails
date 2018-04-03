@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
     s.authors       = ["B1nj0y"]
     s.email         = 'idegorepl@gmail.com'
     s.files         = Dir['MIT-LICENSE', 'README.md', 'lib/**/*']
-    s.homepage      = 'https://github.com/goonr/go-on-rails'
+    s.homepage      = 'https://github.com/railstack/go-on-rails'
     s.license       = 'MIT'
     s.require_paths = ['lib']
 end
