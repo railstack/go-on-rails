@@ -16,7 +16,7 @@ module GoOnRails
     }.freeze
 
     # COALESCE datetime typed field for different databases
-    # sqlite3 is dependent on the driver: https://github.com/goonr/go-sqlite3, details see: https://github.com/mattn/go-sqlite3/pull/468
+    # sqlite3 is dependent on the driver: https://github.com/railstack/go-sqlite3, details see: https://github.com/mattn/go-sqlite3/pull/468
     DATETIME_COALESCE_MAP = {
       "sqlite3"  => "CAST(COALESCE(%s, '0001-01-01T00:00:00Z') as text) AS %s",
       "mysql"    => "COALESCE(%s, CONVERT_TZ('0001-01-01 00:00:00','+00:00','UTC')) AS %s",
