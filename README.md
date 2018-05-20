@@ -52,10 +52,10 @@ You must have an existed Rails app or to create a new one before you try go-on-r
 After that you can run the command just as other Rails generators:
 
 ```bash
-bundle exec rails g gor [dev(elopment) | pro(duction) | test | ...] [-m model_a model_b model_c ...]
+rails g gor [dev(elopment) | pro(duction) | test | ...] [-m model_a model_b model_c ...]
 
 # OR (on rails version < 5.0)
-bundle exec rake g gor ...
+rake g gor ...
 ```
 
 here we take generating all models for the `development` environment for example:
@@ -69,7 +69,7 @@ Then a folder named `go_app` that includes Golang codes will be generated under 
 Install the dependent Golang packages for this Go project:
 
 ```bash
-bundle exec rails gor:deps
+rails gor:deps
 ```
 
 Then change to the `go_app` directory and run:
@@ -83,7 +83,7 @@ You can visit the page in http://localhost:4000 by default.
 More command details about go-on-rails generator:
 
 ```bash
-bundle exec rails g gor --help
+rails g gor --help
 ```
 
 ## What will be generated?
