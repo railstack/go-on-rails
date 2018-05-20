@@ -1,5 +1,5 @@
 <%#- var_pmn stands for pluralized model name, its format is same as the table name -#%>
-<%- var_pmn = table_name = @model_name.underscore.pluralize -%>
+<%- var_pmn = table_name = @model_name.tableize -%>
 <%#- var_umn stands for underscored model name -#%>
 <%- var_umn = @model_name.underscore -%>
 <%- fields  = @struct_info[:select_fields] -%>

@@ -5,6 +5,7 @@
 [![Gem Version](https://badge.fury.io/rb/go-on-rails.svg)](https://badge.fury.io/rb/go-on-rails)
 [![Build Status](https://travis-ci.org/railstack/go-on-rails.svg?branch=dev)](https://travis-ci.org/railstack/go-on-rails)
 [![Maintainability](https://api.codeclimate.com/v1/badges/6fba1f226f027a14c19b/maintainability)](https://codeclimate.com/github/railstack/go-on-rails/maintainability)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/railstack/go-on-rails/blob/master/MIT-LICENSE)
 
 
 # Go on Rails
