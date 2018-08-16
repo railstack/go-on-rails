@@ -50,11 +50,17 @@ class GorGenerator < Rails::Generators::Base
     # iterate the structs info to generate codes for each model
     @all_structs_info.each do |k, v|
       @model_name, @struct_info = k, v
-      template "gor_model.go.erb", "go_app/models/gor_#{@model_name.underscore}.go"
+      if @db_config[:driver_name] == "postgres"
+        template "gor_model_postgres.go.erb", "go_app/models/gor_#{@model_name.underscore}.go"
+      else
+        template "gor_model_mysql.go.erb", "go_app/models/gor_#{@model_name.underscore}.go"
+      end
     end
 
     # generate program for database connection
     template "db.go.erb", "go_app/models/db.go"
+    # and utils
+    template "utils.go.erb", "go_app/models/utils.go"
 
     unless options[:only_models]
       # generate the main.go

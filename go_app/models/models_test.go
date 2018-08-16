@@ -73,17 +73,36 @@ func TestPhysicianCreateValidationFail(t *testing.T) {
 	}
 }
 
-// TestPhysicianCreateValidationPass will pass:
+// TestPhysicianObjectCreateValidationPass will pass:
 // The name "New Doctor" can pass string length restrict validation: 10 is in range 6..15
-func TestPhysicianCreateValidationPass(t *testing.T) {
+// The physician created hear will be for further testing of destroying a physician
+func TestPhysicianObjectCreateValidationPass(t *testing.T) {
 	p := &Physician{Name: "New Doctor", Introduction: "A new doctor is welcomed!"}
 	id, err := p.Create()
 	if err != nil {
 		t.Error(err)
 	}
-	p, err = FindPhysician(id)
+	_, err = FindPhysician(id)
 	if err != nil {
 		t.Error("Create physician failure")
+	}
+}
+
+// TestPhysicianCreateValidationPass will pass:
+// The name "New Doctor 2" can pass string length restrict validation: 10 is in range 6..15
+func TestPhysicianCreateValidationPass(t *testing.T) {
+	p := map[string]interface{}{"name": "New Doctor 2", "introduction": "A new doctor is welcomed!"}
+	id, err := CreatePhysician(p)
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = FindPhysician(id)
+	if err != nil {
+		t.Error("Create physician failure")
+	}
+	err = DestroyPhysician(id)
+	if err != nil {
+		t.Error("Delete physician failure")
 	}
 }
 
