@@ -29,7 +29,7 @@
 在 Rails 项目的 Gemfile 中添加下面一行:
 
 ```ruby
-gem 'go-on-rails', '~> 0.3.0'
+gem 'go-on-rails', '~> 0.3.1'
 ```
 
 然后运行:
