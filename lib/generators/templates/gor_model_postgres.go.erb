@@ -1,0 +1,988 @@
+<%#- var_pmn stands for pluralized model name, its format is same as the table name -#%>
+<%- var_pmn = table_name = @model_name.tableize -%>
+<%#- var_umn stands for underscored model name -#%>
+<%- var_umn = @model_name.underscore -%>
+<%- fields  = @struct_info[:select_fields] -%>
+<%- col_names = @struct_info[:col_names] -%>
+<%- has_assoc = !@struct_info[:assoc_info][:has_many].empty? || !@struct_info[:assoc_info][:has_one].empty? -%>
+// Package models includes the functions on the model <%= @model_name %>.
+package models
+
+import (
+	"errors"
+	"fmt"
+	"log"
+	"math"
+	"strings"
+<%- if @struct_info[:has_datetime_type] -%>
+	"time"
+<%- end -%>
+
+	"github.com/asaskevich/govalidator"
+)
+
+// set flags to output more detailed log
+func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+}
+
+type <%= @model_name %> struct {
+	<%= @struct_info[:struct_body] -%>
+}
+
+// DataStruct for the pagination
+type <%= @model_name %>Page struct {
+	WhereString string
+	WhereParams []interface{}
+	Order       map[string]string
+	FirstId     int64
+	LastId      int64
+	PageNum     int
+	PerPage     int
+	TotalPages  int
+	TotalItems  int64
+	orderStr    string
+}
+
+// Current get the current page of <%= @model_name %>Page object for pagination.
+func (_p *<%= @model_name %>Page) Current() ([]<%= @model_name %>, error) {
+	if _, exist := _p.Order["id"]; !exist {
+		return nil, errors.New("No id order specified in Order map")
+	}
+	err := _p.buildPageCount()
+	if err != nil {
+		return nil, fmt.Errorf("Calculate page count error: %v", err)
+	}
+	if _p.orderStr == "" {
+		_p.buildOrder()
+	}
+	idStr, idParams := _p.buildIdRestrict("current")
+	whereStr := fmt.Sprintf("%s %s %s FETCH NEXT %v ROWS ONLY", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
+	whereParams := []interface{}{}
+	whereParams = append(append(whereParams, _p.WhereParams...), idParams...)
+	<%= var_pmn %>, err := Find<%= @model_name.pluralize %>Where(whereStr, whereParams...)
+	if err != nil {
+		return nil, err
+	}
+	if len(<%= var_pmn %>) != 0 {
+		_p.FirstId, _p.LastId = <%= var_pmn %>[0].Id, <%= var_pmn %>[len(<%= var_pmn %>)-1].Id
+	}
+	return <%= var_pmn %>, nil
+}
+
+// Previous get the previous page of <%= @model_name %>Page object for pagination.
+func (_p *<%= @model_name %>Page) Previous() ([]<%= @model_name %>, error) {
+	if _p.PageNum == 0 {
+		return nil, errors.New("This's the first page, no previous page yet")
+	}
+	if _, exist := _p.Order["id"]; !exist {
+		return nil, errors.New("No id order specified in Order map")
+	}
+	err := _p.buildPageCount()
+	if err != nil {
+		return nil, fmt.Errorf("Calculate page count error: %v", err)
+	}
+	if _p.orderStr == "" {
+		_p.buildOrder()
+	}
+	idStr, idParams := _p.buildIdRestrict("previous")
+	whereStr := fmt.Sprintf("%s %s %s FETCH NEXT %v ROWS ONLY", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
+	whereParams := []interface{}{}
+	whereParams = append(append(whereParams, _p.WhereParams...), idParams...)
+	<%= var_pmn %>, err := Find<%= @model_name.pluralize %>Where(whereStr, whereParams...)
+	if err != nil {
+		return nil, err
+	}
+	if len(<%= var_pmn %>) != 0 {
+		_p.FirstId, _p.LastId = <%= var_pmn %>[0].Id, <%= var_pmn %>[len(<%= var_pmn %>)-1].Id
+	}
+	_p.PageNum -= 1
+	return <%= var_pmn %>, nil
+}
+
+// Next get the next page of <%= @model_name %>Page object for pagination.
+func (_p *<%= @model_name %>Page) Next() ([]<%= @model_name %>, error) {
+	if _p.PageNum == _p.TotalPages-1 {
+		return nil, errors.New("This's the last page, no next page yet")
+	}
+	if _, exist := _p.Order["id"]; !exist {
+		return nil, errors.New("No id order specified in Order map")
+	}
+	err := _p.buildPageCount()
+	if err != nil {
+		return nil, fmt.Errorf("Calculate page count error: %v", err)
+	}
+	if _p.orderStr == "" {
+		_p.buildOrder()
+	}
+	idStr, idParams := _p.buildIdRestrict("next")
+	whereStr := fmt.Sprintf("%s %s %s FETCH NEXT %v ROWS ONLY", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
+	whereParams := []interface{}{}
+	whereParams = append(append(whereParams, _p.WhereParams...), idParams...)
+	<%= var_pmn %>, err := Find<%= @model_name.pluralize %>Where(whereStr, whereParams...)
+	if err != nil {
+		return nil, err
+	}
+	if len(<%= var_pmn %>) != 0 {
+		_p.FirstId, _p.LastId = <%= var_pmn %>[0].Id, <%= var_pmn %>[len(<%= var_pmn %>)-1].Id
+	}
+	_p.PageNum += 1
+	return <%= var_pmn %>, nil
+}
+
+// GetPage is a helper function for the <%= @model_name %>Page object to return a corresponding page due to
+// the parameter passed in, i.e. one of "previous, current or next".
+func (_p *<%= @model_name %>Page) GetPage(direction string) (ps []<%= @model_name %>, err error) {
+	switch direction {
+	case "previous":
+		ps, _ = _p.Previous()
+	case "next":
+		ps, _ = _p.Next()
+	case "current":
+		ps, _ = _p.Current()
+	default:
+		return nil, errors.New("Error: wrong dircetion! None of previous, current or next!")
+	}
+	return
+}
+
+// buildOrder is for <%= @model_name %>Page object to build a SQL ORDER BY clause.
+func (_p *<%= @model_name %>Page) buildOrder() {
+	tempList := []string{}
+	for k, v := range _p.Order {
+		tempList = append(tempList, fmt.Sprintf("%v %v", k, v))
+	}
+	_p.orderStr = " ORDER BY " + strings.Join(tempList, ", ")
+}
+
+// buildIdRestrict is for <%= @model_name %>Page object to build a SQL clause for ID restriction,
+// implementing a simple keyset style pagination.
+func (_p *<%= @model_name %>Page) buildIdRestrict(direction string) (idStr string, idParams []interface{}) {
+	bindVarNumber := len(_p.WhereParams) + 1
+	switch direction {
+	case "previous":
+		if strings.ToLower(_p.Order["id"]) == "desc" {
+			idStr += fmt.Sprintf("id > $%v ", bindVarNumber)
+			idParams = append(idParams, _p.FirstId)
+		} else {
+			idStr += fmt.Sprintf("id < $%v ", bindVarNumber)
+			idParams = append(idParams, _p.FirstId)
+		}
+	case "current":
+		// trick to make Where function work
+		if _p.PageNum == 0 && _p.FirstId == 0 && _p.LastId == 0 {
+			idStr += fmt.Sprintf("id > $%v ", bindVarNumber)
+			idParams = append(idParams, 0)
+		} else {
+			if strings.ToLower(_p.Order["id"]) == "desc" {
+				idStr += fmt.Sprintf("id <= $%v AND id >= $%v  ", bindVarNumber, bindVarNumber + 1)
+				idParams = append(idParams, _p.FirstId, _p.LastId)
+			} else {
+				idStr += fmt.Sprintf("id >= $%v AND id <= $%v  ", bindVarNumber, bindVarNumber + 1)
+				idParams = append(idParams, _p.FirstId, _p.LastId)
+			}
+		}
+	case "next":
+		if strings.ToLower(_p.Order["id"]) == "desc" {
+			idStr += fmt.Sprintf("id < $%v ", bindVarNumber)
+			idParams = append(idParams, _p.LastId)
+		} else {
+			idStr += fmt.Sprintf("id > $%v ", bindVarNumber)
+			idParams = append(idParams, _p.LastId)
+		}
+	}
+	if _p.WhereString != "" {
+		idStr = " AND " + idStr
+	}
+	return
+}
+
+// buildPageCount calculate the TotalItems/TotalPages for the <%= @model_name %>Page object.
+func (_p *<%= @model_name %>Page) buildPageCount() error {
+	count, err := <%= @model_name %>CountWhere(_p.WhereString, _p.WhereParams...)
+	if err != nil {
+		return err
+	}
+	_p.TotalItems = count
+	if _p.PerPage == 0 {
+		_p.PerPage = 10
+	}
+	_p.TotalPages = int(math.Ceil(float64(_p.TotalItems) / float64(_p.PerPage)))
+	return nil
+}
+
+
+// Find<%= @model_name %> find a single <%= var_umn %> by an ID.
+func Find<%= @model_name %>(id int64) (*<%= @model_name %>, error) {
+	if id == 0 {
+		return nil, errors.New("Invalid ID: it can't be zero")
+	}
+	_<%= var_umn %> := <%= @model_name %>{}
+	err := DB.Get(&_<%= var_umn %>, DB.Rebind(`SELECT <%= fields %> FROM <%= table_name %> WHERE <%= table_name %>.id = $1 LIMIT 1`), id)
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+		return nil, err
+	}
+	return &_<%= var_umn %>, nil
+}
+
+// First<%= @model_name %> find the first one <%= var_umn %> by ID ASC order.
+func First<%= @model_name %>() (*<%= @model_name %>, error) {
+	_<%= var_umn %> := <%= @model_name %>{}
+	err := DB.Get(&_<%= var_umn %>, DB.Rebind(`SELECT <%= fields %> FROM <%= table_name %> ORDER BY <%= table_name %>.id ASC LIMIT 1`))
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+		return nil, err
+	}
+	return &_<%= var_umn %>, nil
+}
+
+// First<%= @model_name.pluralize %> find the first N <%= var_umn.pluralize %> by ID ASC order.
+func First<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
+	_<%= var_pmn %> := []<%= @model_name %>{}
+	sql := fmt.Sprintf("SELECT <%= fields %> FROM <%= table_name %> ORDER BY <%= table_name %>.id ASC LIMIT %v", n)
+	err := DB.Select(&_<%= var_pmn %>, DB.Rebind(sql))
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+		return nil, err
+	}
+	return _<%= var_pmn %>, nil
+}
+
+// Last<%= @model_name %> find the last one <%= var_umn %> by ID DESC order.
+func Last<%= @model_name %>() (*<%= @model_name %>, error) {
+	_<%= var_umn %> := <%= @model_name %>{}
+	err := DB.Get(&_<%= var_umn %>, DB.Rebind(`SELECT <%= fields %> FROM <%= table_name %> ORDER BY <%= table_name %>.id DESC LIMIT 1`))
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+		return nil, err
+	}
+	return &_<%= var_umn %>, nil
+}
+
+// Last<%= @model_name.pluralize %> find the last N <%= var_umn.pluralize %> by ID DESC order.
+func Last<%= @model_name.pluralize %>(n uint32) ([]<%= @model_name %>, error) {
+	_<%= var_pmn %> := []<%= @model_name %>{}
+	sql := fmt.Sprintf("SELECT <%= fields %> FROM <%= table_name %> ORDER BY <%= table_name %>.id DESC LIMIT %v", n)
+	err := DB.Select(&_<%= var_pmn %>, DB.Rebind(sql))
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+		return nil, err
+	}
+	return _<%= var_pmn %>, nil
+}
+
+// Find<%= @model_name.pluralize %> find one or more <%= var_umn.pluralize %> by the given ID(s).
+func Find<%= @model_name.pluralize %>(ids ...int64) ([]<%= @model_name %>, error) {
+	if len(ids) == 0 {
+		msg := "At least one or more ids needed"
+		log.Println(msg)
+		return nil, errors.New(msg)
+	}
+	_<%= var_pmn %> := []<%= @model_name %>{}
+	idsHolder := buildIdsHolder(len(ids))
+	sql := DB.Rebind(fmt.Sprintf(`SELECT <%= fields %> FROM <%= table_name %> WHERE <%= table_name %>.id IN (%s)`, idsHolder))
+	idsT := []interface{}{}
+	for _,id := range ids {
+		idsT = append(idsT, interface{}(id))
+	}
+	err := DB.Select(&_<%= var_pmn %>, sql, idsT...)
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+		return nil, err
+	}
+	return _<%= var_pmn %>, nil
+}
+
+// Find<%= @model_name %>By find a single <%= var_umn %> by a field name and a value.
+func Find<%= @model_name %>By(field string, val interface{}) (*<%= @model_name %>, error) {
+	_<%= var_umn %> := <%= @model_name %>{}
+	sqlFmt := `SELECT <%= fields %> FROM <%= table_name %> WHERE %s = ? LIMIT 1`
+	sqlStr := fmt.Sprintf(sqlFmt, field)
+	err := DB.Get(&_<%= var_umn %>, DB.Rebind(sqlStr), val)
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+		return nil, err
+	}
+	return &_<%= var_umn %>, nil
+}
+
+// Find<%= @model_name.pluralize %>By find all <%= var_pmn %> by a field name and a value.
+func Find<%= @model_name.pluralize %>By(field string, val interface{}) (_<%= var_pmn %> []<%= @model_name %>, err error) {
+	sqlFmt := `SELECT <%= fields %> FROM <%= table_name %> WHERE %s = ?`
+	sqlStr := fmt.Sprintf(sqlFmt, field)
+	err = DB.Select(&_<%= var_pmn %>, DB.Rebind(sqlStr), val)
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+		return nil, err
+	}
+	return _<%= var_pmn %>, nil
+}
+
+// All<%= @model_name.pluralize %> get all the <%= @model_name %> records.
+func All<%= @model_name.pluralize %>() (<%= var_pmn %> []<%= @model_name %>, err error) {
+	err = DB.Select(&<%= var_pmn %>, "SELECT <%= fields %> FROM <%= table_name %>")
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return <%= var_pmn %>, nil
+}
+
+// <%= @model_name %>Count get the count of all the <%= @model_name %> records.
+func <%= @model_name %>Count() (c int64, err error) {
+	err = DB.Get(&c, "SELECT count(*) FROM <%= table_name %>")
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	return c, nil
+}
+
+// <%= @model_name %>CountWhere get the count of all the <%= @model_name %> records with a where clause.
+func <%= @model_name %>CountWhere(where string, args ...interface{}) (c int64, err error) {
+	sql := "SELECT count(*) FROM <%= table_name %>"
+	if len(where) > 0 {
+		sql = sql + " WHERE " + where
+	}
+	stmt, err := DB.Preparex(DB.Rebind(sql))
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	err = stmt.Get(&c, args...)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	return c, nil
+}
+
+// <%= @model_name %>IncludesWhere get the <%= @model_name %> associated models records, currently it's not same as the corresponding "includes" function but "preload" instead in Ruby on Rails. It means that the "sql" should be restricted on <%= @model_name %> model.
+func <%= @model_name %>IncludesWhere(assocs []string, sql string, args ...interface{}) (_<%= var_pmn %> []<%= @model_name %>, err error) {
+	_<%= var_pmn %>, err = Find<%= @model_name.pluralize %>Where(sql, args...)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	if len(assocs) == 0 {
+		log.Println("No associated fields ard specified")
+		return _<%= var_pmn %>, err
+	}
+	if len(_<%= var_pmn %>) <= 0 {
+		return nil, errors.New("No results available")
+	}
+	ids := make([]interface{}, len(_<%= var_pmn %>))
+	for _, v := range _<%= var_pmn %> {
+		ids = append(ids, interface{}(v.Id))
+	}
+	<%- if has_assoc -%>
+	idsHolder := buildIdsHolder(len(ids))
+	for _, assoc := range assocs {
+		switch assoc {
+			<%- unless @struct_info[:assoc_info][:has_many].empty? -%>
+				<%- has_many = @struct_info[:assoc_info][:has_many] -%>
+				<%- has_many.each do |k, v| -%>
+				case "<%= k.underscore.pluralize %>":
+				    <%- if v[:through] || v[:as] -%>
+						// FIXME: optimize the query
+						for i, vvv := range  _<%= var_pmn %> {
+							_<%= k.underscore.pluralize %>, err := <%= @model_name %>Get<%= k.pluralize %>(vvv.Id)
+							if err != nil {
+								continue
+							}
+							vvv.<%= k %> = _<%= k.underscore.pluralize %>
+						    _<%= var_pmn %>[i] = vvv
+						}
+					<%- else -%>
+						<%- if v[:foreign_key] -%>
+							where := fmt.Sprintf("<%= v[:foreign_key] %> IN (%s)", idsHolder)
+						<%- else -%>
+							where := fmt.Sprintf("<%= var_umn %>_id IN (%s)", idsHolder)
+						<%- end -%>
+						_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>Where(where, ids...)
+						if err != nil {
+							log.Printf("Error when query associated objects: %v\n", assoc)
+							continue
+						}
+						for _, vv := range _<%= v[:class_name].underscore.pluralize %> {
+							for i, vvv := range  _<%= var_pmn %> {
+								<%- if v[:foreign_key] -%>
+									if vv.<%= v[:foreign_key].to_s.camelize %> == vvv.Id {
+										vvv.<%= k %> = append(vvv.<%= k %>, vv)
+									}
+								<%- else -%>
+									if vv.<%= @model_name.camelize %>Id == vvv.Id {
+										vvv.<%= k %> = append(vvv.<%= k %>, vv)
+									}
+								<%- end -%>
+								_<%= var_pmn %>[i].<%= k %> = vvv.<%= k %>
+						    }
+					    }
+				    <%- end -%>
+				<%- end -%>
+			<%- end -%>
+			<%- unless @struct_info[:assoc_info][:has_one].empty? -%>
+				<%- has_one = @struct_info[:assoc_info][:has_one] -%>
+				<%- has_one.each do |k, v| -%>
+				case "<%= k.underscore %>":
+					<%- if v[:foreign_key] -%>
+						where := fmt.Sprintf("<%= v[:foreign_key] %> IN (%s)", idsHolder)
+					<%- else -%>
+						where := fmt.Sprintf("<%= var_umn %>_id IN (%s)", idsHolder)
+					<%- end -%>
+					_<%= v[:class_name].underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>Where(where, ids...)
+					if err != nil {
+						log.Printf("Error when query associated objects: %v\n", assoc)
+						continue
+					}
+					for _, vv := range _<%= v[:class_name].underscore.pluralize %> {
+						for i, vvv := range  _<%= var_pmn %> {
+							<%- if v[:foreign_key] -%>
+								if vv.<%= v[:foreign_key].to_s.camelize %> == vvv.Id {
+									vvv.<%= k %> = vv
+								}
+							<%- else -%>
+								if vv.<%= @model_name.camelize %>Id == vvv.Id {
+									vvv.<%= k %> = vv
+								}
+							<%- end -%>
+							_<%= var_pmn %>[i].<%= k %> = vvv.<%= k %>
+						}
+					}
+				<%- end -%>
+			<%- end -%>
+		}
+	}
+	<%- end -%>
+	return _<%= var_pmn %>, nil
+}
+
+// <%= @model_name %>Ids get all the IDs of <%= @model_name %> records.
+func <%= @model_name %>Ids() (ids []int64, err error) {
+	err = DB.Select(&ids, "SELECT id FROM <%= table_name %>")
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return ids, nil
+}
+
+// <%= @model_name %>IdsWhere get all the IDs of <%= @model_name %> records by where restriction.
+func <%= @model_name %>IdsWhere(where string, args ...interface{}) ([]int64, error) {
+	ids, err := <%= @model_name %>IntCol("id", where, args...)
+	return ids, err
+}
+
+// <%= @model_name %>IntCol get some int64 typed column of <%= @model_name %> by where restriction.
+func <%= @model_name %>IntCol(col, where string, args ...interface{}) (intColRecs []int64, err error) {
+	sql := "SELECT " + col + " FROM <%= table_name %>"
+	if len(where) > 0 {
+		sql = sql + " WHERE " + where
+	}
+	stmt, err := DB.Preparex(DB.Rebind(sql))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	err = stmt.Select(&intColRecs, args...)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return intColRecs, nil
+}
+
+// <%= @model_name %>StrCol get some string typed column of <%= @model_name %> by where restriction.
+func <%= @model_name %>StrCol(col, where string, args ...interface{}) (strColRecs []string, err error) {
+	sql := "SELECT " + col + " FROM <%= table_name %>"
+	if len(where) > 0 {
+		sql = sql + " WHERE " + where
+	}
+	stmt, err := DB.Preparex(DB.Rebind(sql))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	err = stmt.Select(&strColRecs, args...)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return strColRecs, nil
+}
+
+// Find<%= @model_name.pluralize %>Where query use a partial SQL clause that usually following after WHERE
+// with placeholders, eg: FindUsersWhere("first_name = ? AND age > ?", "John", 18)
+// will return those records in the table "users" whose first_name is "John" and age elder than 18.
+func Find<%= @model_name.pluralize %>Where(where string, args ...interface{}) (<%= var_pmn %> []<%= @model_name %>, err error) {
+	sql := "SELECT <%= fields %> FROM <%= table_name %>"
+	if len(where) > 0 {
+		sql = sql + " WHERE " + where
+	}
+	stmt, err := DB.Preparex(DB.Rebind(sql))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	err = stmt.Select(&<%= var_pmn %>, args...)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return <%= var_pmn %>, nil
+}
+
+// Find<%= @model_name %>BySql query use a complete SQL clause
+// with placeholders, eg: FindUserBySql("SELECT * FROM users WHERE first_name = ? AND age > ? ORDER BY DESC LIMIT 1", "John", 18)
+// will return only One record in the table "users" whose first_name is "John" and age elder than 18.
+func Find<%= @model_name %>BySql(sql string, args ...interface{}) (*<%= @model_name %>, error) {
+	stmt, err := DB.Preparex(DB.Rebind(sql))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	_<%= var_umn %> := &<%= @model_name %>{}
+	err = stmt.Get(_<%= var_umn %>, args...)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return _<%= var_umn %>, nil
+}
+
+// Find<%= @model_name.pluralize %>BySql query use a complete SQL clause
+// with placeholders, eg: FindUsersBySql("SELECT * FROM users WHERE first_name = ? AND age > ?", "John", 18)
+// will return those records in the table "users" whose first_name is "John" and age elder than 18.
+func Find<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (<%= var_pmn %> []<%= @model_name %>, err error) {
+	stmt, err := DB.Preparex(DB.Rebind(sql))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	err = stmt.Select(&<%= var_pmn %>, args...)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return <%= var_pmn %>, nil
+}
+
+// Create<%= @model_name %> use a named params to create a single <%= @model_name %> record.
+// A named params is key-value map like map[string]interface{}{"first_name": "John", "age": 23} .
+func Create<%= @model_name %>(am map[string]interface{}) (int64, error) {
+	if len(am) == 0 {
+		return 0, fmt.Errorf("Zero key in the attributes map!")
+	}
+<%- unless @struct_info[:timestamp_cols].empty? -%>
+	t := time.Now()
+	for _, v := range []string{<%= @struct_info[:timestamp_cols].map(&:inspect).join(", ") %>} {
+		if am[v] == nil {
+			am[v] = t
+		}
+	}
+<%- end -%>
+	keys := allKeys(am)
+	sqlFmt := `INSERT INTO <%= table_name %> (%s) VALUES (%s) RETURNING id`
+	sql := fmt.Sprintf(sqlFmt, strings.Join(keys, ","), ":"+strings.Join(keys, ",:"))
+	stmt, err := DB.PrepareNamed(sql)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	var lastId int64
+	err = stmt.Get(&lastId, am)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	return lastId, nil
+}
+
+// Create is a method for <%= @model_name %> to create a record.
+func (_<%= var_umn %> *<%= @model_name %>) Create() (int64, error) {
+	ok, err := govalidator.ValidateStruct(_<%= var_umn %>)
+	if !ok {
+		errMsg := "Validate <%= @model_name %> struct error: Unknown error"
+		if err != nil {
+			errMsg = "Validate <%= @model_name %> struct error: " + err.Error()
+		}
+		log.Println(errMsg)
+		return 0, errors.New(errMsg)
+	}
+<%- unless @struct_info[:timestamp_cols].empty? -%>
+	t := time.Now()
+	<%- @struct_info[:timestamp_cols].each do |c| -%>
+	_<%= var_umn %>.<%= c.camelize %> = t
+    <%- end -%>
+<%- end -%>
+    sql := `INSERT INTO <%= table_name %> (<%= col_names.join(",") %>) VALUES (:<%= col_names.join(",:") %>) RETURNING id`
+	stmt, err := DB.PrepareNamed(sql)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	var lastId int64
+	err = stmt.Get(&lastId, _<%= var_umn %>)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	return lastId, nil
+}
+
+<%- unless @struct_info[:assoc_info][:has_many].empty? -%>
+	<%- has_many = @struct_info[:assoc_info][:has_many] -%>
+	<%- has_many.each do |k, v| -%>
+// <%= k.pluralize %>Create is used for <%= @model_name %> to create the associated objects <%= k.pluralize %>
+func (_<%= var_umn %> *<%= @model_name %>) <%= k.pluralize %>Create(am map[string]interface{}) error {
+	<%- if v[:through] -%>
+		// FIXME: use transaction to create these associated objects
+		<%= v[:class_name].underscore %>Id, err := Create<%= v[:class_name] %>(am)
+		if err != nil {
+			return err
+		}
+		_, err = Create<%= v[:through].to_s.singularize.camelize %>(map[string]interface{}{"<%= var_umn %>_id": _<%= var_umn %>.Id, "<%= v[:class_name].underscore %>_id": <%= v[:class_name].underscore %>Id})
+	<%- elsif v[:as] -%>
+		am["<%= v[:as] %>_id"] = _<%= var_umn %>.Id
+		am["<%= v[:as] %>_type"] = "<%= @model_name %>"
+		_, err := Create<%= v[:class_name] %>(am)
+	<%- else -%>
+		<%- if v[:foreign_key] -%>
+			am["<%= v[:foreign_key] %>"] = _<%= var_umn %>.Id
+		<%- else -%>
+			am["<%= var_umn %>_id"] = _<%= var_umn %>.Id
+		<%- end -%>
+		_, err := Create<%= v[:class_name] %>(am)
+	<%- end -%>
+	return err
+}
+
+// Get<%= k.pluralize %> is used for <%= @model_name %> to get associated objects <%= k.pluralize %>
+// Say you have a <%= @model_name %> object named <%= var_umn %>, when you call <%= var_umn %>.Get<%= k.pluralize %>(),
+// the object will get the associated <%= k.pluralize %> attributes evaluated in the struct.
+func (_<%= var_umn %> *<%= @model_name %>) Get<%= k.pluralize %>() error {
+	_<%= k.underscore.pluralize %>, err := <%= @model_name %>Get<%= k.pluralize %>(_<%= var_umn %>.Id)
+	if err == nil {
+		_<%= var_umn %>.<%= k %> = _<%= k.underscore.pluralize %>
+    }
+    return err
+}
+
+// <%= @model_name %>Get<%= k.pluralize %> a helper fuction used to get associated objects for <%= @model_name %>IncludesWhere().
+func <%= @model_name %>Get<%= k.pluralize %>(id int64) ([]<%= v[:class_name] %>, error) {
+	<%- if v[:through] -%>
+		// FIXME: use transaction to create these associated objects
+		<%- target_table = v[:class_name].underscore.pluralize -%>
+		<%- through_table = v[:through].to_s.pluralize -%>
+		sql := `SELECT <%= @all_structs_info[v[:class_name]][:select_fields] %>
+		        FROM   <%= target_table %>
+		               INNER JOIN <%= through_table %>
+		                       ON <%= target_table %>.id = <%= through_table %>.<%= v[:class_name].underscore %>_id
+		        WHERE <%= through_table %>.<%= var_umn %>_id = ?`
+		_<%= k.underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>BySql(sql, id)
+	<%- elsif v[:as] -%>
+		where := `<%= v[:as] %>_type = "<%= @model_name %>" AND <%= v[:as] %>_id = ?`
+		_<%= k.underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>Where(where, id)
+	<%- else -%>
+		<%- if v[:foreign_key] -%>
+			_<%= k.underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>By("<%= v[:foreign_key] %>", id)
+		<%- else -%>
+			_<%= k.underscore.pluralize %>, err := Find<%= v[:class_name].pluralize %>By("<%= var_umn %>_id", id)
+		<%- end -%>
+	<%- end -%>
+	return _<%= k.underscore.pluralize %>, err
+}
+
+	<%- end -%>
+<%- end -%>
+
+<%- unless @struct_info[:assoc_info][:has_one].empty? -%>
+	<%- has_one = @struct_info[:assoc_info][:has_one] -%>
+	<%- has_one.each do |k, v| -%>
+// Create<%= k %> is a method for the <%= @model_name %> model object to create an associated <%= k %> record.
+func (_<%= var_umn %> *<%= @model_name %>) Create<%= k %>(am map[string]interface{}) error {
+	<%- if v[:foreign_key] -%>
+	am["<%= v[:foreign_key] %>"] = _<%= var_umn %>.Id
+    <%- else -%>
+	am["<%= var_umn %>_id"] = _<%= var_umn %>.Id
+	<%- end -%>
+	_, err := Create<%= v[:class_name] %>(am)
+	return err
+}
+	<%- end -%>
+<%- end -%>
+
+<%- unless @struct_info[:assoc_info][:belongs_to].empty? -%>
+	<%- belongs_to = @struct_info[:assoc_info][:belongs_to] -%>
+	<%- belongs_to.each do |k, v| -%>
+    <%-# don't create virtual table for polymorphic model -%>
+	<%- next if v[:polymorphic] -%>
+// Create<%= k %> is a method for a <%= @model_name %> object to create an associated <%= k %> record.
+func (_<%= var_umn %> *<%= @model_name %>) Create<%= k %>(am map[string]interface{}) error {
+	<%- if v[:foreign_key] -%>
+	am["<%= v[:foreign_key] %>"] = _<%= var_umn %>.Id
+    <%- else -%>
+	am["<%= var_umn %>_id"] = _<%= var_umn %>.Id
+	<%- end -%>
+	_, err := Create<%= v[:class_name] %>(am)
+	return err
+}
+	<%- end -%>
+<%- end -%>
+
+// Destroy is method used for a <%= @model_name %> object to be destroyed.
+func (_<%= var_umn %> *<%= @model_name %>) Destroy() error {
+	if _<%= var_umn %>.Id == 0 {
+		return errors.New("Invalid Id field: it can't be a zero value")
+	}
+	err := Destroy<%= @model_name %>(_<%= var_umn %>.Id)
+	return err
+}
+
+// Destroy<%= @model_name %> will destroy a <%= @model_name %> record specified by the id parameter.
+func Destroy<%= @model_name %>(id int64) error {
+	<%- if @struct_info[:has_assoc_dependent] -%>
+	// Destroy association objects at first
+	// Not care if exec properly temporarily
+	destroy<%= @model_name %>Associations(id)
+    <%- end -%>
+	stmt, err := DB.Preparex(DB.Rebind(`DELETE FROM <%= table_name %> WHERE id = ?`))
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Destroy<%= @model_name.pluralize %> will destroy <%= @model_name %> records those specified by the ids parameters.
+func Destroy<%= @model_name.pluralize %>(ids ...int64) (int64, error) {
+	if len(ids) == 0 {
+		msg := "At least one or more ids needed"
+		log.Println(msg)
+		return 0, errors.New(msg)
+	}
+	<%- if @struct_info[:has_assoc_dependent] -%>
+	// Destroy association objects at first
+	// Not care if exec properly temporarily
+	destroy<%= @model_name %>Associations(ids...)
+	<%- end -%>
+	idsHolder := buildIdsHolder(len(ids))
+	sql := fmt.Sprintf(`DELETE FROM <%= table_name %> WHERE id IN (%s)`, idsHolder)
+	idsT := []interface{}{}
+	for _,id := range ids {
+		idsT = append(idsT, interface{}(id))
+	}
+	stmt, err := DB.Preparex(DB.Rebind(sql))
+	result, err := stmt.Exec(idsT...)
+	if err != nil {
+		return 0, err
+	}
+	cnt, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return cnt, nil
+}
+
+// Destroy<%= @model_name.pluralize %>Where delete records by a where clause restriction.
+// e.g. Destroy<%= @model_name.pluralize %>Where("name = ?", "John")
+// And this func will not call the association dependent action
+func Destroy<%= @model_name.pluralize %>Where(where string, args ...interface{}) (int64, error) {
+	sql := `DELETE FROM <%= table_name %> WHERE `
+	if len(where) > 0 {
+		sql = sql + where
+	} else {
+		return 0, errors.New("No WHERE conditions provided")
+	}
+	<%- if @struct_info[:has_assoc_dependent] -%>
+	ids, x_err := <%= @model_name %>IdsWhere(where, args...)
+	if x_err != nil {
+		log.Printf("Delete associated objects error: %v\n", x_err)
+	} else {
+		destroy<%= @model_name %>Associations(ids...)
+	}
+	<%- end -%>
+	stmt, err := DB.Preparex(DB.Rebind(sql))
+	result, err := stmt.Exec(args...)
+	if err != nil {
+		return 0, err
+	}
+	cnt, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return cnt, nil
+}
+
+<%- if @struct_info[:has_assoc_dependent] -%>
+// destroy<%= @model_name %>Associations is a private function used to destroy a <%= @model_name %> record's associated objects.
+// The func not return err temporarily.
+func destroy<%= @model_name %>Associations(ids ...int64) {
+	idsHolder := ""
+	if len(ids) > 1 {
+		idsHolder := buildIdsHolder(len(ids))
+	}
+	idsT := []interface{}{}
+	for _, id := range ids {
+		idsT = append(idsT, interface{}(id))
+	}
+	var err error
+	// make sure no declared-and-not-used exception
+	_, _, _ = idsHolder, idsT, err
+	<%- [:has_many, :has_one].each do |ass| -%>
+		<%- ass_cols = @struct_info[:assoc_info][ass] -%>
+		<%- unless ass_cols.empty? -%>
+			<%- ass_cols.each_value do |opts| -%>
+				<%- if opts.key? :dependent -%>
+					<%- case opts[:dependent] -%>
+					<%- when :destroy, :delete_all -%>
+						<%- if opts[:through] -%>
+							where := fmt.Sprintf("id IN (SELECT id FROM <%= opts[:through].to_s %> WHERE <%= var_umn %>_id IN (%s))", idsHolder)
+							_, err = Destroy<%= opts[:class_name].pluralize %>Where(where, idsT...)
+							if err != nil {
+								log.Printf("Destroy associated object %s error: %v\n", "<%= opts[:class_name].pluralize %>", err)
+							}
+							where = fmt.Sprintf("<%= var_umn %>_id IN (%s)", idsHolder)
+							_, err = Destroy<%= opts[:through].to_s.pluralize.camelize %>Where(where, idsT...)
+							if err != nil {
+								log.Printf("Destroy associated object %s error: %v\n", "<%= opts[:through].to_s.singularize.camelize %>", err)
+							}
+						<%- elsif opts[:as] -%>
+							where := fmt.Sprintf(`<%= opts[:as] %>_type = "<%= @model_name %>" AND <%= opts[:as] %>_id IN (%s)`, idsHolder)
+							_, err = Destroy<%= opts[:class_name].pluralize %>Where(where, idsT...)
+							if err != nil {
+								log.Printf("Destroy associated object %s error: %v\n", "<%= opts[:class_name].pluralize %>", err)
+							}
+						<%- else -%>
+							<%- if opts.key? :foreign_key -%>
+								where := fmt.Sprintf("<%= opts[:foreign_key] %> IN (%s)", idsHolder)
+							<%- else -%>
+								where := fmt.Sprintf("<%= var_umn %>_id IN (%s)", idsHolder)
+							<%- end -%>
+							_, err = Destroy<%= opts[:class_name].pluralize %>Where(where, idsT...)
+							if err != nil {
+								log.Printf("Destroy associated object %s error: %v\n", "<%= opts[:class_name].pluralize %>", err)
+							}
+						<%- end -%>
+					<%- when :nullify -%>
+						// no sql.NULLType supported, just set the associated field to zero value of int64
+						<%- if opts[:through] -%>
+							sql := fmt.Sprintf("UPDATE <%= opts[:through].to_s %> SET <%= opts[:class_name].underscore %>_id = 0 WHERE <%= opts[:class_name].underscore %>_id IN (%s)", idsHolder)
+							_, err = Update<%= opts[:through].to_s.camelize %>BySql(sql, idsT...)
+							if err != nil {
+								log.Printf("Delete associated object %s error: %v\n", "<%= opts[:class_name].pluralize %>", err)
+							}
+						<%- else -%>
+							<%- if opts.key? :foreign_key -%>
+								sql := fmt.Sprintf("UPDATE <%= opts[:class_name].underscore.pluralize %> SET <%= opts[:foreign_key] %> = 0 WHERE <%= opts[:foreign_key] %> IN (%s)", idsHolder)
+							<%- else -%>
+								sql := fmt.Sprintf("UPDATE <%= opts[:class_name].underscore.pluralize %> SET <%= var_umn %>_id = 0 WHERE <%= var_umn %>_id IN (%s)", idsHolder)
+							<%- end -%>
+							_, err = Update<%= opts[:class_name].pluralize %>BySql(sql, idsT...)
+							if err != nil {
+								log.Printf("Delete associated object %s error: %v\n", "<%= opts[:class_name].pluralize %>", err)
+							}
+						<%- end -%>
+					<%- end -%>
+				<%- end -%>
+			<%- end -%>
+		<%- end -%>
+	<%- end -%>
+}
+<%- end -%>
+
+// Save method is used for a <%= @model_name %> object to update an existed record mainly.
+// If no id provided a new record will be created. FIXME: A UPSERT action will be implemented further.
+func (_<%= var_umn %> *<%= @model_name %>) Save() error {
+	ok, err := govalidator.ValidateStruct(_<%= var_umn %>)
+	if !ok {
+		errMsg := "Validate <%= @model_name %> struct error: Unknown error"
+		if err != nil {
+			errMsg = "Validate <%= @model_name %> struct error: " + err.Error()
+		}
+		log.Println(errMsg)
+		return errors.New(errMsg)
+	}
+	if _<%= var_umn %>.Id == 0 {
+		_, err = _<%= var_umn %>.Create()
+		return err
+	}
+<%- if @struct_info[:timestamp_cols].include? "updated_at" -%>
+	_<%= var_umn %>.UpdatedAt = time.Now()
+<%- end -%>
+	sqlFmt := `UPDATE <%= table_name %> SET %s WHERE id = %v`
+	<%- save_col_names = col_names - ["created_at"] -%>
+	sqlStr := fmt.Sprintf(sqlFmt, "<%= save_col_names.zip(save_col_names).map{|c| c.join(" = :")}.join(", ") %>", _<%= var_umn %>.Id)
+    _, err = DB.NamedExec(sqlStr, _<%= var_umn %>)
+    return err
+}
+
+// Update<%= @model_name %> is used to update a record with a id and map[string]interface{} typed key-value parameters.
+func Update<%= @model_name %>(id int64, am map[string]interface{}) error {
+	if len(am) == 0 {
+		return errors.New("Zero key in the attributes map!")
+	}
+<%- if @struct_info[:timestamp_cols].include? "updated_at" -%>
+	am["updated_at"] = time.Now()
+<%- end -%>
+	keys := allKeys(am)
+	sqlFmt := `UPDATE <%= table_name %> SET %s WHERE id = %v`
+	setKeysArr := []string{}
+	for _,v := range keys {
+		s := fmt.Sprintf(" %s = :%s", v, v)
+		setKeysArr = append(setKeysArr, s)
+	}
+	sqlStr := fmt.Sprintf(sqlFmt, strings.Join(setKeysArr, ", "), id)
+	_, err := DB.NamedExec(sqlStr, am)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
+// Update is a method used to update a <%= @model_name %> record with the map[string]interface{} typed key-value parameters.
+func (_<%= var_umn %> *<%= @model_name %>) Update(am map[string]interface{}) error {
+	if _<%= var_umn %>.Id == 0 {
+		return errors.New("Invalid Id field: it can't be a zero value")
+	}
+	err := Update<%= @model_name %>(_<%= var_umn %>.Id, am)
+	return err
+}
+
+// UpdateAttributes method is supposed to be used to update <%= @model_name %> records as corresponding update_attributes in Ruby on Rails.
+func (_<%= var_umn %> *<%= @model_name %>) UpdateAttributes(am map[string]interface{}) error {
+	if _<%= var_umn %>.Id == 0 {
+		return errors.New("Invalid Id field: it can't be a zero value")
+	}
+	err := Update<%= @model_name %>(_<%= var_umn %>.Id, am)
+	return err
+}
+
+// UpdateColumns method is supposed to be used to update <%= @model_name %> records as corresponding update_columns in Ruby on Rails.
+func (_<%= var_umn %> *<%= @model_name %>) UpdateColumns(am map[string]interface{}) error {
+	if _<%= var_umn %>.Id == 0 {
+		return errors.New("Invalid Id field: it can't be a zero value")
+	}
+	err := Update<%= @model_name %>(_<%= var_umn %>.Id, am)
+	return err
+}
+
+// Update<%= @model_name.pluralize %>BySql is used to update <%= @model_name %> records by a SQL clause
+// using the '$1...$n' binding syntax.
+func Update<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (int64, error) {
+	if sql == "" {
+		return 0, errors.New("A blank SQL clause")
+	}
+	stmt, err := DB.Preparex(DB.Rebind(sql))
+	result, err := stmt.Exec(args...)
+	if err != nil {
+		return 0, err
+	}
+	cnt, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return cnt, nil
+}

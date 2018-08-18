@@ -1,5 +1,5 @@
 <%#- var_pmn stands for pluralized model name, its format is same as the table name -#%>
-<%- var_pmn = table_name = @model_name.underscore.pluralize -%>
+<%- var_pmn = table_name = @model_name.tableize -%>
 <%#- var_umn stands for underscored model name -#%>
 <%- var_umn = @model_name.underscore -%>
 <%- fields  = @struct_info[:select_fields] -%>
@@ -57,11 +57,7 @@ func (_p *<%= @model_name %>Page) Current() ([]<%= @model_name %>, error) {
 		_p.buildOrder()
 	}
 	idStr, idParams := _p.buildIdRestrict("current")
-<% if @db_config[:driver_name] == "postgres" %>
-	whereStr := fmt.Sprintf("%s %s %s FETCH NEXT %v ROWS ONLY", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
-<% else %>
 	whereStr := fmt.Sprintf("%s %s %s LIMIT %v", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
-<% end %>
 	whereParams := []interface{}{}
 	whereParams = append(append(whereParams, _p.WhereParams...), idParams...)
 	<%= var_pmn %>, err := Find<%= @model_name.pluralize %>Where(whereStr, whereParams...)
@@ -90,11 +86,7 @@ func (_p *<%= @model_name %>Page) Previous() ([]<%= @model_name %>, error) {
 		_p.buildOrder()
 	}
 	idStr, idParams := _p.buildIdRestrict("previous")
-<% if @db_config[:driver_name] == "postgres" %>
-	whereStr := fmt.Sprintf("%s %s %s FETCH NEXT %v ROWS ONLY", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
-<% else %>
 	whereStr := fmt.Sprintf("%s %s %s LIMIT %v", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
-<% end %>
 	whereParams := []interface{}{}
 	whereParams = append(append(whereParams, _p.WhereParams...), idParams...)
 	<%= var_pmn %>, err := Find<%= @model_name.pluralize %>Where(whereStr, whereParams...)
@@ -124,11 +116,7 @@ func (_p *<%= @model_name %>Page) Next() ([]<%= @model_name %>, error) {
 		_p.buildOrder()
 	}
 	idStr, idParams := _p.buildIdRestrict("next")
-<% if @db_config[:driver_name] == "postgres" %>
-	whereStr := fmt.Sprintf("%s %s %s FETCH NEXT %v ROWS ONLY", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
-<% else %>
 	whereStr := fmt.Sprintf("%s %s %s LIMIT %v", _p.WhereString, idStr, _p.orderStr, _p.PerPage)
-<% end %>
 	whereParams := []interface{}{}
 	whereParams = append(append(whereParams, _p.WhereParams...), idParams...)
 	<%= var_pmn %>, err := Find<%= @model_name.pluralize %>Where(whereStr, whereParams...)
@@ -593,15 +581,10 @@ func Create<%= @model_name %>(am map[string]interface{}) (int64, error) {
 		}
 	}
 <%- end -%>
-	keys := make([]string, len(am))
-	i := 0
-	for k := range am {
-		keys[i] = k
-		i++
-	}
+	keys := allKeys(am)
 	sqlFmt := `INSERT INTO <%= table_name %> (%s) VALUES (%s)`
-	sqlStr := fmt.Sprintf(sqlFmt, strings.Join(keys, ","), ":"+strings.Join(keys, ",:"))
-	result, err := DB.NamedExec(sqlStr, am)
+	sql := fmt.Sprintf(sqlFmt, strings.Join(keys, ","), ":"+strings.Join(keys, ",:"))
+	result, err := DB.NamedExec(sql, am)
 	if err != nil {
 		log.Println(err)
 		return 0, err
@@ -940,12 +923,7 @@ func Update<%= @model_name %>(id int64, am map[string]interface{}) error {
 <%- if @struct_info[:timestamp_cols].include? "updated_at" -%>
 	am["updated_at"] = time.Now()
 <%- end -%>
-	keys := make([]string, len(am))
-	i := 0
-	for k := range am {
-		keys[i] = k
-		i++
-	}
+	keys := allKeys(am)
 	sqlFmt := `UPDATE <%= table_name %> SET %s WHERE id = %v`
 	setKeysArr := []string{}
 	for _,v := range keys {
@@ -994,10 +972,6 @@ func Update<%= @model_name.pluralize %>BySql(sql string, args ...interface{}) (i
 	if sql == "" {
 		return 0, errors.New("A blank SQL clause")
 	}
-<%- if @struct_info[:timestamp_cols].include? "updated_at" -%>
-	sql = strings.Replace(strings.ToLower(sql), "set", "set updated_at = ?, ", 1)
-	args = append([]interface{}{time.Now()}, args...)
-<%- end -%>
 	stmt, err := DB.Preparex(DB.Rebind(sql))
 	result, err := stmt.Exec(args...)
 	if err != nil {

@@ -26,3 +26,11 @@ test_sqlite:
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
   database: db/test.sqlite3
+
+test_postgres:
+  adapter: postgresql
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  timeout: 5000
+  database: go-on-rails_test_postgres
+  username: test_postgres
+  password: secret
