@@ -3,7 +3,7 @@ version: '3'
 services:
   <%- if %w[127.0.0.1 localhost].include? @db_config[:host] and @db_config[:driver_name] != "sqlite3" -%>
   # generated according to the config/database.yml
-  database:
+  db:
     image: <%= @db_config[:driver_name] %>
     ports:
       - '<%= @db_config[:port] %>:<%= @db_config[:port] %>'
@@ -18,7 +18,7 @@ services:
       - "3000:3000"
   <%- if %w[127.0.0.1 localhost].include? @db_config[:host] and @db_config[:driver_name] != "sqlite3" -%>
     depends_on:
-      - database
+      - db
   <%- end -%>
 
   # golang app part. It depends on the rails_app to initialize the database
@@ -32,6 +32,6 @@ services:
       - "4000:4000"
     depends_on:
   <%- if %w[127.0.0.1 localhost].include? @db_config[:host] and @db_config[:driver_name] != "sqlite3" -%>
-      - database
+      - db
   <%- end -%>
       - rails_app

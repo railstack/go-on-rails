@@ -6,7 +6,7 @@ FROM golang:1.9.2 as builder
 WORKDIR /root/
 COPY . /root/
 <%- if %w[127.0.0.1 localhost].include? @db_config[:host] and @db_config[:driver_name] != "sqlite3" -%>
-RUN perl -pi -e "s/tcp\(.*?:/tcp\(database:/; s/host=\S+? /host=database /" models/db.go
+RUN perl -pi -e "s/tcp\(.*?:/tcp\(db:/; s/host=\S+? /host=db /" models/db.go
 <%- end -%>
 RUN make deps
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o myapp .
