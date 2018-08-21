@@ -96,7 +96,9 @@ rails gor:doc
 
 ## 已知问题
 
-* 没有针对不同的数据库，比如 MySQL, Postgres 分别生成其不同的版本
+目前该项目还在持续开发中，还有很多不完善的方面。非常欢迎发现问题时提 issue 或者贡献代码👏 。
+
+* 针对不同的数据库，比如 MySQL, Postgres 分别生成的函数还需完善
 * 没有支持 sql.NullType 的数据类型，所以如果某个表中的字段出现 Null 时程序可能会出错，所以目前临时的做法是：你最好在 migration 中定义好 "not null"，给一个和 Go 的数据类型的零值相一致的默认值。同时，我们给出了一个使用零值的解决方案，详见 wiki: [Working with database nullable fields](https://github.com/railstack/go-on-rails/wiki/Working-with-database-nullable-fields) 。
 
 - [x] Associations
@@ -113,6 +115,12 @@ rails gor:doc
 - [x] Pagination(details see [wiki](https://github.com/railstack/go-on-rails/wiki/Pagination))
 - [ ] Callbacks
 - [ ] Transactions
+
+## 已支持的数据库
+
+* SQLite
+* MySQL
+* Postgres
 
 ## Wiki
 
