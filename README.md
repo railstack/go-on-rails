@@ -107,7 +107,7 @@ Besides, there's [a sample project](https://github.com/railstack/gor_models_samp
 
 ## Known issues and TODOs
 
-The gem is still under development, so there're some known issues. You're welcomed to contribute. 👏
+The gem is still under development, so there're some known issues. You're welcomed to [contribute](#contributing). 👏
 
 * databases specific functions between MySQL and Postgres or other databases are not covered completely
 * sql.NullType not supported yet, so you'd better in the migrations set those columns "not null" with a default value that's consistent with Golang's zero value specification, such as "" default for string and text typed column, and 0 default for int, etc. And now we have an alternative approch for manipulating the database nullable fields, see the wiki [Working with database nullable fields](https://github.com/railstack/go-on-rails/wiki/Working-with-database-nullable-fields)

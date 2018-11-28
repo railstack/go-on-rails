@@ -22,7 +22,7 @@ module GoOnRails
             end
           end
           type_name = "[]#{class_name}"
-          if col_name && type_name && (self.models.include? class_name)
+          if col_name && type_name && self.models.include?(class_name)
             info[:struct_body] << sprintf("%s %s `%s`\n", col_name, type_name, tags.join(" "))
             info[:assoc_info][:has_many][col_name] = {class_name: class_name}
             info[:assoc_info][:has_many][col_name].merge!(assoc.options) unless assoc.options.empty?
@@ -38,7 +38,7 @@ module GoOnRails
             end
           end
           type_name = class_name
-          if col_name && type_name && (self.models.include? class_name)
+          if col_name && type_name && self.models.include?(class_name)
             info[:struct_body] << sprintf("%s %s `%s`\n", col_name, type_name, tags.join(" "))
             info[:assoc_info][assoc.macro][col_name] = {class_name: class_name}
             info[:assoc_info][assoc.macro][col_name].merge!(assoc.options) unless assoc.options.empty?
