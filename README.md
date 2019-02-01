@@ -90,7 +90,7 @@ rails g gor --help
 
 * Go project directory layout (all under the `go_app` directory, like `views`, `controllers`, `public`)
 * A Go data struct corresponding to each activerecord model
-* And each struct related CRUD functions/methods like FindModel, UpdateModel, DestroyModle etc. All these models related program files under the `go_app/models` directory
+* And each struct related CRUD functions/methods like FindModel, UpdateModel, DestroyModel etc. All these models related program files under the `go_app/models` directory
 * And godoc files for all the functions under `go_app/models/doc`
 * We use [Gin](https://github.com/gin-gonic/gin) as the default web framework, but you can change it to anyone that you favor in `main.go` and `controllers` programs
 
@@ -157,7 +157,7 @@ When I had the idea to convert Rails app or build Golang app with Rails tools, I
 
 There're two branches at present: `master` and `dev`.
 
-The `dev` branch has a whole Rails environment for development: models, seeds for testing, and under `go_app` directory there's a file named `modles_test.go` used to test generated Golang codes.
+The `dev` branch has a whole Rails environment for development: models, seeds for testing, and under `go_app` directory there's a file named `models_test.go` used to test generated Golang codes.
 
 - Fork the project switch to branch `dev`.
 - Make your feature addition or bug fix.
