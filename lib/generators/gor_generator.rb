@@ -121,6 +121,7 @@ class GorGenerator < Rails::Generators::Base
   end
 
   def generate_go_docs
+    # FIXME: godoc command not support -html flag after Go 1.12
     models_dir = Rails.root.join('go_app', 'models').to_s
     return unless Dir.exist?(File.expand_path(models_dir))
     doc_dir = File.join(models_dir, "doc")
