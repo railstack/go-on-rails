@@ -1,31 +1,36 @@
 # This test focuses on the generated Go codes to make things simple:
-# 1. Ruby use v2.3.4, specified in the Gemfile due to it's available in Travis-ci by default
-# 2. Rails is v5.0.2, also specified in Gemfile, it'll be installed by bundler
+# 1. Ruby use v2.6.3, specified in .ruby-version configuration
+# 2. Rails is v5.1.7, specified in Gemfile, it'll be installed by bundler
 # 3. we just test MySQL database using the Travis-ci's default service version
-# 4. and we set RAILS_ENV=test in Travis-ci's Environment Variables setting
 
 language: go
 
+# Here Go versions have to correspond with https://github.com/go-sql-driver/mysql/blob/master/.travis.yml
+# if we hope a green tag in our README
 go:
-    - 1.8.x
-    - 1.9.x
-    - 1.10.x
-    - master
+  - 1.9.x
+  - 1.10.x
+  - 1.11.x
+  - 1.12.x
+  - master
+
+env:
+  - RAILS_ENV=test
 
 services:
-    - mysql
+  - mysql
 
 before_install:
-    - mysql -e 'CREATE DATABASE go_on_rails_test;'
+  - rvm install 2.6.3 --default
+  - mysql -e 'CREATE DATABASE go_on_rails_test;'
 
 install:
-    - go get github.com/jmoiron/sqlx
-    - go get github.com/go-sql-driver/mysql
-    - go get github.com/asaskevich/govalidator
-    - rvm install 2.3.4 --default
-    - bundle install --jobs=3 --retry=3
-    - rails db:migrate
-    - rails db:seed
-    - rails generate gor test
+  - go get github.com/jmoiron/sqlx
+  - go get github.com/go-sql-driver/mysql
+  - go get github.com/asaskevich/govalidator
+  - bundle install --jobs=3 --retry=3
+  - rails db:migrate
+  - rails db:seed
+  - rails generate gor test
 
 script: go test ./go_app/models
