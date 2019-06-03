@@ -33,4 +33,4 @@ install:
   - rails db:seed
   - rails generate gor test
 
-script: go test ./go_app/models
+script: go test ./go_app/src/models

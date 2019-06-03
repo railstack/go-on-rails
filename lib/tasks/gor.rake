@@ -20,14 +20,14 @@ namespace :gor do
 
   desc 'View the doc of all the functions generated on models'
   task :doc do
-    models_dir = Rails.root.join('go_app', 'models').to_s
-    puts 'Please open "http://localhost:7979/doc/models.html" to view the doc of all functions generated on models.'
+    models_dir = Rails.root.join('go_app', 'src/models').to_s
+    puts 'Please open "http://localhost:7979/doc/" to view the doc of all functions generated on models.'
     puts 'Use Ctrl-C to terminate this server!'
     if RUBY_PLATFORM =~ /darwin/
-      system 'open http://localhost:7979/doc/models.html'
+      system 'open http://localhost:7979/doc/'
     elsif RUBY_PLATFORM =~ /cygwin|mswin|mingw|bccwin|wince|emx/
-      system 'start http://localhost:7979/doc/models.html'
+      system 'start http://localhost:7979/doc/'
     end
-    system "godoc -goroot #{models_dir} -http=:7979"
+    system "GOPATH=#{Rails.root.join('go_app').to_s} godoc -goroot #{models_dir} -http=:7979"
   end
 end

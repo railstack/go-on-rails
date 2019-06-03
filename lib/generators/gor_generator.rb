@@ -51,16 +51,16 @@ class GorGenerator < Rails::Generators::Base
     @all_structs_info.each do |k, v|
       @model_name, @struct_info = k, v
       if @db_config[:driver_name] == "postgres"
-        template "gor_model_postgres.go.erb", "go_app/models/gor_#{@model_name.underscore}.go"
+        template "gor_model_postgres.go.erb", "go_app/src/models/gor_#{@model_name.underscore}.go"
       else
-        template "gor_model_mysql.go.erb", "go_app/models/gor_#{@model_name.underscore}.go"
+        template "gor_model_mysql.go.erb", "go_app/src/models/gor_#{@model_name.underscore}.go"
       end
     end
 
     # generate program for database connection
-    template "db.go.erb", "go_app/models/db.go"
+    template "db.go.erb", "go_app/src/models/db.go"
     # and utils
-    template "utils.go.erb", "go_app/models/utils.go"
+    template "utils.go.erb", "go_app/src/models/utils.go"
 
     unless options[:only_models]
       # generate the main.go
@@ -121,12 +121,12 @@ class GorGenerator < Rails::Generators::Base
   end
 
   def generate_go_docs
-    # FIXME: godoc command not support -html flag after Go 1.12
-    models_dir = Rails.root.join('go_app', 'models').to_s
+    models_dir = Rails.root.join('go_app', 'src/models').to_s
     return unless Dir.exist?(File.expand_path(models_dir))
-    doc_dir = File.join(models_dir, "doc")
+    doc_dir = File.join(models_dir, 'doc')
     Dir.mkdir(doc_dir) unless Dir.exist?(doc_dir)
-    system "godoc -html #{models_dir} | awk '{ gsub(\"/src/target\", \"\"); print }' > #{doc_dir}/models.html"
+    Dir.chdir Rails.root.join('go_app').to_s
+    system "GOPATH=./ godoc -url /pkg/models > #{doc_dir}/index.html"
   end
 end
 

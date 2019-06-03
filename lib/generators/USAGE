@@ -1,5 +1,5 @@
 Description:
-    Generate Golang app by Rails models: use Rails as a model and migration tool to build a Golang app, or migrate some of existed Rails APIs to Golang to decouple and high-perform your services.
+    Generate Golang app by Rails models: use Rails as a modeling and migration tool to build a Golang app, or migrate some of existed Rails APIs to Golang to decouple and high-perform your services.
 
     Read more: https://github.com/railstack/go-on-rails
 
@@ -7,7 +7,7 @@ Description:
 Example:
     rails generate gor development -m user post
 
-    Here are valid ENV_NAME arguments by default for a Rails generated database configuration by default: [dev, development, pro, production, test]. The default ENV_NAME is "development" if you omit one. Obviously, you can reconfig the config/database.yml to define your environments.
+    Here are valid ENV_NAME arguments by default for a Rails generated database configuration by default: [dev, development, pro, production, test]. The default ENV_NAME is "development" if you omit one. Obviously, you can reconfig the config/database.yml to define your own environments.
 
     So you can also run:
 
@@ -28,5 +28,5 @@ Example:
 
     rails g gor
 
-    This will generate code of all the models and database connection in Rails development environment.
+    This will generate code of all the models with the database connection in Rails development environment configuration.
 
