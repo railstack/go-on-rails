@@ -1,14 +1,17 @@
 <p align="center">
   <img width="260" height="260" src="./go-on-rails.png">
 </p>
+<h3 align="center"><a href="https://railstack.github.io">Go on Rails</a></h3>
+<p align="center">Use Rails to generate Golang code or manage Go app development<p>
 
-[![Gem Version](https://badge.fury.io/rb/go-on-rails.svg)](https://badge.fury.io/rb/go-on-rails)
-[![Build Status](https://travis-ci.org/railstack/go-on-rails.svg?branch=dev)](https://travis-ci.org/railstack/go-on-rails)
-[![Maintainability](https://api.codeclimate.com/v1/badges/6fba1f226f027a14c19b/maintainability)](https://codeclimate.com/github/railstack/go-on-rails/maintainability)
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/railstack/go-on-rails/blob/master/MIT-LICENSE)
+<p align="center">
+  <a href="https://badge.fury.io/rb/go-on-rails"><img src="https://badge.fury.io/rb/go-on-rails.svg" alt="Gem Version"></a>
+  <a href="https://travis-ci.org/railstack/go-on-rails"><img src="https://travis-ci.org/railstack/go-on-rails.svg?branch=dev" alt="Build Status"></a>
+  <a href="https://codeclimate.com/github/railstack/go-on-rails/maintainability"><img src="https://api.codeclimate.com/v1/badges/6fba1f226f027a14c19b/maintainability" alt="Maintainability"></a>
+  <a href="https://github.com/railstack/go-on-rails/blob/master/MIT-LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"></a>
+</p>
 
-
-# Go on Rails
+---
 
 [用 Rails 开发 Go 应用：中文文档](./README_zh.md)
 
