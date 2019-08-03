@@ -22,14 +22,14 @@
 ## 安装环境要求
 
 * Rails 4.2 及以上
-* Go 1.7 及以上
+* Go 1.9 及以上(主要是为了兼容 github.com/go-sql-driver/mysql，如果你不用该驱动，可以考虑更低版本)
 
 ## 安装
 
 在 Rails 项目的 Gemfile 中添加下面一行:
 
 ```ruby
-gem 'go-on-rails', '~> 0.3.1'
+gem 'go-on-rails', '~> 0.4.0'
 ```
 
 然后运行:
