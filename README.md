@@ -29,14 +29,14 @@ Here's some examples:
 ## Prerequisites
 
 * Rails 4.2+
-* Golang 1.7.x
+* Golang 1.9.x(mainly be compatible with github.com/go-sql-driver/mysql)
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'go-on-rails', '~> 0.3.1'
+gem 'go-on-rails', '~> 0.4.0'
 ```
 
 And then execute:
