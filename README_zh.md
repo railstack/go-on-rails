@@ -25,8 +25,8 @@
 
 ## 安装环境要求
 
-* Rails 4.2 及以上
-* Go 1.9 及以上(主要是为了兼容 github.com/go-sql-driver/mysql，如果你不用该驱动，可以考虑更低版本)
+* Rails 4.2 及以上(Rails 6 尚未支持，需要您的加入)
+* Go 1.10 及以上(主要是为了兼容 github.com/go-sql-driver/mysql，如果你不用该驱动，可以考虑更低版本)
 
 ## 安装
 

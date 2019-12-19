@@ -29,7 +29,7 @@ Here's some examples:
 ## Prerequisites
 
 * Rails 4.2+ (Rails 6 not supported and need your help)
-* Golang 1.9.x(mainly be compatible with github.com/go-sql-driver/mysql)
+* Golang 1.10.x(mainly be compatible with github.com/go-sql-driver/mysql)
 
 ## Installation
 
