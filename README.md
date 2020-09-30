@@ -17,14 +17,14 @@
 
 `go-on-rails` is a Rails generator aims to:
 
-1. Help to develop and integrate some APIs written in Golang to existed Rails app for high performance
-2. Use your farmiliar Rails tools to develop and manage a Golang app project
+1. Help to develop and integrate some APIs written in Golang to existing Rails app for high performance
+2. Use your familiar Rails tools to develop and manage a Golang app project
 3. Convert a *not very complicated* Rails app to Golang equivalent
 
 Here's some examples:
 * A simple [example(tutorial)](https://github.com/railstack/example_simple) on the basic usage of go-on-rails generator
 * [An advanced example](https://github.com/railstack/example_with_admin) shows how to integrate Go APIs in a Rails project
-* [Another example](https://github.com/railstack/example_read_rails_session) shows how to handle a Rails session to get an user's info in a go-on-rails generated Go API
+* [Another example](https://github.com/railstack/example_read_rails_session) shows how to handle a Rails session to get a user's info in a go-on-rails generated Go API
 
 ## Prerequisites
 
@@ -50,7 +50,7 @@ $ gem install go-on-rails
 ```
 ## Usage
 
-You must have an existed Rails app or to create a new one before you try go-on-rails to generate Golang codes.
+You must have an existing Rails app or to create a new one before you try go-on-rails to generate Golang codes.
 
 After that you can run the command just as other Rails generators:
 
@@ -113,7 +113,7 @@ Besides, there's [a sample project](https://github.com/railstack/gor_models_samp
 The gem is still under development, so there're some known issues. You're welcomed to [contribute](#contributing). 👏
 
 * databases specific functions between MySQL and Postgres or other databases are not covered completely
-* sql.NullType not supported yet, so you'd better in the migrations set those columns "not null" with a default value that's consistent with Golang's zero value specification, such as "" default for string and text typed column, and 0 default for int, etc. And now we have an alternative approch for manipulating the database nullable fields, see the wiki [Working with database nullable fields](https://github.com/railstack/go-on-rails/wiki/Working-with-database-nullable-fields)
+* sql.NullType not supported yet, so you'd better in the migrations set those columns "not null" with a default value that's consistent with Golang's zero value specification, such as "" default for string and text typed column, and 0 default for int, etc. And now we have an alternative approach for manipulating the database nullable fields, see the wiki [Working with database nullable fields](https://github.com/railstack/go-on-rails/wiki/Working-with-database-nullable-fields)
 
 - [x] Associations
   - [x] has_many
@@ -154,7 +154,7 @@ The gem is still under development, so there're some known issues. You're welcom
 
 ## Acknowledgement
 
-When I had the idea to convert Rails app or build Golang app with Rails tools, I searched github and found the project: https://github.com/t-k/ar2gostruct. And from ar2gostruct I copied some codes on handling data structure convertion and models association, it make my idea come true faster than I imagined.
+When I had the idea to convert Rails app or build Golang app with Rails tools, I searched github and found the project: https://github.com/t-k/ar2gostruct. And from ar2gostruct I copied some codes on handling data structure conversion and models association, it made my idea come true faster than I imagined.
 
 ## Contributing
 
