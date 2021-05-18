@@ -8,7 +8,7 @@ end
 
 gem 'rails', '~> 5.1.7'
 gem 'mysql2', '>= 0.3.18', '< 0.5'
-gem 'puma', '~> 3.0'
+gem 'puma', '~> 4.3'
 gem 'sqlite3'
 gem 'pg'
 
